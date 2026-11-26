@@ -29,7 +29,8 @@ Pakete von nuget.org, dafür ist Internet nötig. `install.sh` kopiert alles in 
 im Startmenü an. Es prüft vorher die Prüfsummen und überschreibt nichts, was nicht von d6Downloader stammt.
 
 **Aktualisieren:** d6Downloader beenden, im Projektordner mit `git pull` den neuen Stand holen, dann `publish.sh` und
-`install.sh` noch einmal ausführen. Einstellungen und Downloads bleiben.
+`install.sh` noch einmal ausführen. Einstellungen und Downloads bleiben. Die Browser-Erweiterung danach im Browser neu laden
+(auf der Erweiterungsseite „Neu laden“), sonst behält sie den alten Stand samt Symbol.
 
 ## 2. Starten
 
@@ -207,7 +208,7 @@ Die Erweiterung entfernt man im Browser selbst.
 | Beschädigte Dateien, zur Rettung beiseitegelegt | gleicher Ordner, Endung `.bad` |
 | Programm und Erweiterung | `~/.local/lib/d6downloader/` |
 | Startbefehl (Verknüpfung) | `~/.local/bin/d6downloader` |
-| Startmenü-Eintrag und Symbol | `~/.local/share/applications/d6downloader.desktop`, `~/.local/share/icons/hicolor/256x256/apps/d6downloader.png` |
+| Startmenü-Eintrag und Symbol | `~/.local/share/applications/d6downloader.desktop`, `~/.local/share/icons/hicolor/<Größe>/apps/d6downloader.png` (16, 24, 32, 48, 64, 128 und 256 Pixel) |
 | Autostart | `~/.config/autostart/d6downloader.desktop` |
 | Browser-Verbindung | `d6downloader.host.json` in `~/.config/<Browser>/NativeMessagingHosts/` bzw. `~/.mozilla/native-messaging-hosts/` |
 | Zwischenspeicher des Programms | `~/.net/d6downloader/` |

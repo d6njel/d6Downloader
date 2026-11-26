@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- d6Downloader: kleine Fassung im 16er Raster (16 bis 48 Pixel und Tray). PNGs: tools/render-icons.sh -->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect x="0" y="0" width="16" height="16" rx="3" fill="#04100a"/>
+  <!-- schwacher Code-Regen am Rand -->
+  <g fill="#00e05a">
+    <rect x="1" y="4" width="1" height="1" opacity="0.2"/>
+    <rect x="1" y="6" width="1" height="1" opacity="0.4"/>
+    <rect x="2" y="10" width="1" height="1" opacity="0.25"/>
+    <rect x="14" y="7" width="1" height="1" opacity="0.2"/>
+    <rect x="14" y="9" width="1" height="1" opacity="0.4"/>
+    <rect x="13" y="3" width="1" height="1" opacity="0.25"/>
+  </g>
+  <!-- "d" (x 4-6) und "6" (x 9-11), je 3x5 Pixel -->
+  <path fill="#3dff7f" d="M6 2h1v5H4V4h2z M5 5v1h1V5z"/>
+  <path fill="#3dff7f" d="M9 2h3v1h-2v1h2v3H9z M10 5v1h1V5z"/>
+  <!-- Pfeil -->
+  <path fill="#c8ffd9" d="M7 8h2v1h2v1h-1v1H9v1H7v-1H6v-1H5V9h2z"/>
+  <!-- Ablagelinie -->
+  <rect x="4" y="13" width="8" height="1" fill="#00c853"/>
+</svg>

@@ -117,7 +117,7 @@ RAR-Testdateien stammen aus libarchive, siehe
 ### Fertige Programmdatei
 
 `tools/publish.sh` legt sie unter `dist/d6downloader-<Version>-linux-x64/` ab: eine Datei `d6downloader`, die ohne
-installiertes .NET läuft, daneben `Extension/`, `Licenses/`, `DOKUMENTATION.md`, `d6downloader.png`, `SHA256SUMS` und
+installiertes .NET läuft, daneben `Extension/`, `Licenses/`, `DOKUMENTATION.md`, `d6downloader.png`, `icons/`, `SHA256SUMS` und
 die Skripte `install.sh` und `uninstall.sh`. Installiert wird nach `~/.local/lib/d6downloader` mit der Verknüpfung
 `~/.local/bin/d6downloader`.
 

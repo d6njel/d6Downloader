@@ -43,6 +43,8 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\icon.png" />
+    <!-- Eigene kleine Fassung des Symbols für das Tray, siehe tools/render-icons.sh. -->
+    <AvaloniaResource Include="Assets\tray.png" />
     <!-- Freie Icon-Schrift (MIT), Lizenzdatei daneben. -->
     <AvaloniaResource Include="Assets\Fonts\*.ttf" />
     <None Include="Assets\Fonts\LICENSE-FluentSystemIcons.txt" Link="Licenses\LICENSE-FluentSystemIcons.txt" CopyToOutputDirectory="PreserveNewest" />

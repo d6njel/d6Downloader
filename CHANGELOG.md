@@ -2,6 +2,10 @@
 
 ## d6Downloader 0.2.0 (in Arbeit, noch nicht veröffentlicht)
 
+### Geändert
+
+- Neues eigenes App-Symbol im Hacker-/Matrix-Stil („d6“ mit Download-Pfeil) statt des blauen „Y“: Fenster, Tray, Startmenü (jetzt in 7 Größen) und Browser-Erweiterung. Die Erweiterung im Browser einmal neu laden, damit sie das neue Symbol zeigt.
+
 ### Neu
 
 - Unterhäkchen „Stattdessen endgültig löschen (nicht rückgängig zu machen)“ unter „Archive nach dem Entpacken in den Papierkorb verschieben“ (ab Werk aus, braucht kein `gio`): Die Archivteile werden nur gelöscht, wenn das Entpacken vollständig geklappt hat und alle Teile unverändert sind, sonst bleiben alle liegen. Andere Dateien werden nie gelöscht.

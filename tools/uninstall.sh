@@ -33,7 +33,10 @@ for dir in "$config_home/google-chrome/NativeMessagingHosts" "$config_home/chrom
 done
 
 if [ -L "$bin" ] && [ "$(readlink "$bin")" = "$app_dir/d6downloader" ]; then rm -f -- "$bin"; fi
-rm -f -- "$data_home/applications/d6downloader.desktop" "$data_home/icons/hicolor/256x256/apps/d6downloader.png"
+rm -f -- "$data_home/applications/d6downloader.desktop"
+for size in 16 24 32 48 64 128 256; do
+    rm -f -- "$data_home/icons/hicolor/${size}x${size}/apps/d6downloader.png"
+done
 
 # Nur die installierten Dateien, nie den Ordner als Ganzes.
 if [ -f "$list" ]; then

@@ -24,10 +24,12 @@ install -m 644 "$root/LICENSE" "$out/Licenses/LICENSE"
 install -m 644 "$root/NOTICE.md" "$out/Licenses/NOTICE.md"
 install -m 644 "$root/DOKUMENTATION.md" "$out/DOKUMENTATION.md"
 install -m 644 "$root/assets/d6downloader-256.png" "$out/d6downloader.png"
+cp -R -- "$root/assets/icons" "$out/icons"
 install -m 755 "$root/tools/install.sh" "$out/install.sh"
 install -m 755 "$root/tools/uninstall.sh" "$out/uninstall.sh"
 
-for needed in d6downloader Extension/manifest.json Extension/firefox/manifest.json Licenses/LICENSE-FluentSystemIcons.txt; do
+for needed in d6downloader Extension/manifest.json Extension/firefox/manifest.json Licenses/LICENSE-FluentSystemIcons.txt \
+    icons/hicolor/{16x16,24x24,32x32,48x48,64x64,128x128,256x256}/apps/d6downloader.png; do
     [ -f "$out/$needed" ] || { echo "publish.sh: $needed fehlt im Ergebnis." >&2; exit 1; }
 done
 

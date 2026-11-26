@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- d6Downloader: eigenes App-Symbol (große Fassung). Nur Formen, keine Schriften. PNGs: tools/render-icons.sh -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#08180d"/>
+      <stop offset="1" stop-color="#020604"/>
+    </linearGradient>
+    <linearGradient id="letters" gradientUnits="userSpaceOnUse" x1="0" y1="50" x2="0" y2="119">
+      <stop offset="0" stop-color="#6dff9c"/>
+      <stop offset="1" stop-color="#00d455"/>
+    </linearGradient>
+    <linearGradient id="arrow" gradientUnits="userSpaceOnUse" x1="0" y1="132" x2="0" y2="185">
+      <stop offset="0" stop-color="#5dff8f"/>
+      <stop offset="1" stop-color="#e6fff0"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5"/>
+    </filter>
+    <clipPath id="inside">
+      <rect x="18" y="18" width="220" height="220" rx="42"/>
+    </clipPath>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="44" fill="url(#bg)"/>
+  <g clip-path="url(#inside)">
+    <rect x="29" y="150" width="6" height="8" fill="#c8ffd9" opacity="0.65"/>
+    <rect x="29" y="139" width="6" height="8" fill="#00e05a" opacity="0.47"/>
+    <rect x="29" y="128" width="6" height="8" fill="#00e05a" opacity="0.39"/>
+    <rect x="29" y="117" width="6" height="8" fill="#00e05a" opacity="0.31"/>
+    <rect x="29" y="106" width="6" height="8" fill="#00e05a" opacity="0.24"/>
+    <rect x="29" y="95" width="6" height="8" fill="#00e05a" opacity="0.16"/>
+    <rect x="29" y="84" width="6" height="8" fill="#00e05a" opacity="0.08"/>
+    <rect x="43" y="196" width="6" height="8" fill="#c8ffd9" opacity="1.00"/>
+    <rect x="43" y="185" width="6" height="8" fill="#00e05a" opacity="0.82"/>
+    <rect x="43" y="174" width="6" height="8" fill="#00e05a" opacity="0.74"/>
+    <rect x="43" y="163" width="6" height="8" fill="#00e05a" opacity="0.65"/>
+    <rect x="43" y="152" width="6" height="8" fill="#00e05a" opacity="0.57"/>
+    <rect x="43" y="141" width="6" height="8" fill="#00e05a" opacity="0.49"/>
+    <rect x="43" y="130" width="6" height="8" fill="#00e05a" opacity="0.41"/>
+    <rect x="43" y="119" width="6" height="8" fill="#00e05a" opacity="0.33"/>
+    <rect x="43" y="108" width="6" height="8" fill="#00e05a" opacity="0.25"/>
+    <rect x="43" y="97" width="6" height="8" fill="#00e05a" opacity="0.16"/>
+    <rect x="43" y="86" width="6" height="8" fill="#00e05a" opacity="0.08"/>
+    <rect x="58" y="108" width="6" height="8" fill="#c8ffd9" opacity="0.55"/>
+    <rect x="58" y="97" width="6" height="8" fill="#00e05a" opacity="0.36"/>
+    <rect x="58" y="86" width="6" height="8" fill="#00e05a" opacity="0.27"/>
+    <rect x="58" y="75" width="6" height="8" fill="#00e05a" opacity="0.18"/>
+    <rect x="58" y="64" width="6" height="8" fill="#00e05a" opacity="0.09"/>
+    <rect x="192" y="128" width="6" height="8" fill="#c8ffd9" opacity="0.60"/>
+    <rect x="192" y="117" width="6" height="8" fill="#00e05a" opacity="0.42"/>
+    <rect x="192" y="106" width="6" height="8" fill="#00e05a" opacity="0.33"/>
+    <rect x="192" y="95" width="6" height="8" fill="#00e05a" opacity="0.25"/>
+    <rect x="192" y="84" width="6" height="8" fill="#00e05a" opacity="0.17"/>
+    <rect x="192" y="73" width="6" height="8" fill="#00e05a" opacity="0.08"/>
+    <rect x="207" y="182" width="6" height="8" fill="#c8ffd9" opacity="1.00"/>
+    <rect x="207" y="171" width="6" height="8" fill="#00e05a" opacity="0.81"/>
+    <rect x="207" y="160" width="6" height="8" fill="#00e05a" opacity="0.72"/>
+    <rect x="207" y="149" width="6" height="8" fill="#00e05a" opacity="0.63"/>
+    <rect x="207" y="138" width="6" height="8" fill="#00e05a" opacity="0.54"/>
+    <rect x="207" y="127" width="6" height="8" fill="#00e05a" opacity="0.45"/>
+    <rect x="207" y="116" width="6" height="8" fill="#00e05a" opacity="0.36"/>
+    <rect x="207" y="105" width="6" height="8" fill="#00e05a" opacity="0.27"/>
+    <rect x="207" y="94" width="6" height="8" fill="#00e05a" opacity="0.18"/>
+    <rect x="207" y="83" width="6" height="8" fill="#00e05a" opacity="0.09"/>
+    <rect x="221" y="142" width="6" height="8" fill="#c8ffd9" opacity="0.65"/>
+    <rect x="221" y="131" width="6" height="8" fill="#00e05a" opacity="0.46"/>
+    <rect x="221" y="120" width="6" height="8" fill="#00e05a" opacity="0.37"/>
+    <rect x="221" y="109" width="6" height="8" fill="#00e05a" opacity="0.28"/>
+    <rect x="221" y="98" width="6" height="8" fill="#00e05a" opacity="0.18"/>
+    <rect x="221" y="87" width="6" height="8" fill="#00e05a" opacity="0.09"/>
+  </g>
+  <rect x="17" y="17" width="222" height="222" rx="43" fill="none" stroke="#1aff6a" stroke-opacity="0.35" stroke-width="2"/>
+  <!-- Leuchten: unscharfe Kopie unter dem Schriftzug -->
+  <g fill="#00ff66" opacity="0.8" filter="url(#glow)">
+    <rect x="113.5" y="50" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="60" width="9" height="9" rx="1.2"/>
+    <rect x="83.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="93.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="103.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="73.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="73.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="73.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="83.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="93.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="103.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="153.5" y="50" width="9" height="9" rx="1.2"/>
+    <rect x="163.5" y="50" width="9" height="9" rx="1.2"/>
+    <rect x="143.5" y="60" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="143.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="153.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="163.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="173.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="173.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="143.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="153.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="163.5" y="110" width="9" height="9" rx="1.2"/>
+  </g>
+  <g fill="url(#letters)">
+    <rect x="113.5" y="50" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="60" width="9" height="9" rx="1.2"/>
+    <rect x="83.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="93.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="103.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="73.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="73.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="73.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="83.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="93.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="103.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="113.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="153.5" y="50" width="9" height="9" rx="1.2"/>
+    <rect x="163.5" y="50" width="9" height="9" rx="1.2"/>
+    <rect x="143.5" y="60" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="70" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="143.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="153.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="163.5" y="80" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="173.5" y="90" width="9" height="9" rx="1.2"/>
+    <rect x="133.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="173.5" y="100" width="9" height="9" rx="1.2"/>
+    <rect x="143.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="153.5" y="110" width="9" height="9" rx="1.2"/>
+    <rect x="163.5" y="110" width="9" height="9" rx="1.2"/>
+  </g>
+  <g fill="url(#arrow)">
+    <rect x="113.5" y="132" width="9" height="8" rx="1.2"/>
+    <rect x="123.5" y="132" width="9" height="8" rx="1.2"/>
+    <rect x="133.5" y="132" width="9" height="8" rx="1.2"/>
+    <rect x="113.5" y="141" width="9" height="8" rx="1.2"/>
+    <rect x="123.5" y="141" width="9" height="8" rx="1.2"/>
+    <rect x="133.5" y="141" width="9" height="8" rx="1.2"/>
+    <rect x="93.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="103.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="113.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="123.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="133.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="143.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="153.5" y="150" width="9" height="8" rx="1.2"/>
+    <rect x="103.5" y="159" width="9" height="8" rx="1.2"/>
+    <rect x="113.5" y="159" width="9" height="8" rx="1.2"/>
+    <rect x="123.5" y="159" width="9" height="8" rx="1.2"/>
+    <rect x="133.5" y="159" width="9" height="8" rx="1.2"/>
+    <rect x="143.5" y="159" width="9" height="8" rx="1.2"/>
+    <rect x="113.5" y="168" width="9" height="8" rx="1.2"/>
+    <rect x="123.5" y="168" width="9" height="8" rx="1.2"/>
+    <rect x="133.5" y="168" width="9" height="8" rx="1.2"/>
+    <rect x="123.5" y="177" width="9" height="8" rx="1.2"/>
+  </g>
+  <g fill="#00c853">
+    <rect x="83.5" y="195" width="89" height="9" rx="1.2"/>
+  </g>
+</svg>

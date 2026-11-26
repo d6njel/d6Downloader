@@ -26,7 +26,7 @@ case "${XDG_DATA_HOME:-}" in /*) data_home=$XDG_DATA_HOME ;; *) data_home=$HOME/
 app_dir=$HOME/.local/lib/d6downloader
 bin=$HOME/.local/bin/d6downloader
 desktop=$data_home/applications/d6downloader.desktop
-icon=$data_home/icons/hicolor/256x256/apps/d6downloader.png
+hicolor=$data_home/icons/hicolor
 list=$app_dir/installed-files.txt
 
 [ "$source_dir" != "$app_dir" ] || die "Das ist schon der installierte Ordner."
@@ -48,7 +48,7 @@ if [ -f "$list" ]; then
     done < "$list"
 fi
 
-mkdir -p "$app_dir" "$(dirname "$bin")" "$(dirname "$desktop")" "$(dirname "$icon")"
+mkdir -p "$app_dir" "$(dirname "$bin")" "$(dirname "$desktop")"
 files=$( { sed -n 's/^[0-9a-f]\{64\}  //p' "$source_dir/SHA256SUMS"; echo SHA256SUMS; } )
 printf '%s\ninstalled-files.txt\n' "$files" > "$list"
 while IFS= read -r file; do
@@ -57,7 +57,20 @@ while IFS= read -r file; do
 done <<< "$files"
 
 ln -sfn -- "$app_dir/d6downloader" "$bin"
-install -m 644 -- "$source_dir/d6downloader.png" "$icon"
+if [ -d "$source_dir/icons/hicolor" ]; then
+    for size in 16 24 32 48 64 128 256; do
+        install -D -m 644 -- "$source_dir/icons/hicolor/${size}x${size}/apps/d6downloader.png" \
+            "$hicolor/${size}x${size}/apps/d6downloader.png"
+    done
+else
+    # Ältere Ergebnisse von publish.sh haben nur ein Symbol.
+    install -D -m 644 -- "$source_dir/d6downloader.png" "$hicolor/256x256/apps/d6downloader.png"
+fi
+# Der Oberfläche sagen, dass sich Symbole geändert haben. Einen Symbol-Cache nur erneuern, wenn es schon einen gibt.
+touch -- "$hicolor"
+if [ -f "$hicolor/icon-theme.cache" ] && command -v gtk-update-icon-cache >/dev/null; then
+    gtk-update-icon-cache -f -t "$hicolor" >/dev/null 2>&1 || true
+fi
 
 # Ein Argument für Exec nach der Desktop-Entry-Spezifikation.
 exec_path=$(printf '%s' "$bin" | sed -e 's/[\\"`$]/\\&/g' -e 's/%/%%/g' -e 's/\\/\\\\/g')
@@ -76,6 +89,7 @@ Categories=Network;FileTransfer;
 StartupWMClass=d6downloader
 ENTRY
 chmod 644 "$desktop"
+if command -v kbuildsycoca6 >/dev/null; then kbuildsycoca6 >/dev/null 2>&1 || true; fi
 
 echo "d6Downloader ist installiert."
 echo "  Programm:        $bin"

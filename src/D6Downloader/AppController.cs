@@ -110,7 +110,7 @@ public sealed class AppController : IDisposable
         menu.Items.Add(exit);
         _tray = new TrayIcon
         {
-            Icon = new WindowIcon(AssetLoader.Open(new Uri("avares://d6downloader/Assets/icon.png"))),
+            Icon = new WindowIcon(AssetLoader.Open(new Uri("avares://d6downloader/Assets/tray.png"))),
             ToolTipText = "d6Downloader",
             Menu = menu,
         };
