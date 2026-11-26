@@ -10,6 +10,8 @@ d6Downloader ist eine Vorabfassung. Was noch nie in Wirklichkeit ausprobiert wur
 > ältere Versionsnummern wie `v1.0.0` oder `v1.0.1` sind die **Windows-Fassung** und laufen hier nicht. Bitte nicht
 > „Code > Download ZIP“ nehmen, sondern so vorgehen wie unten (sonst klappt das Aktualisieren nicht).
 
+Es gibt nur den **Quellcode**: Die Releases auf GitHub enthalten keine fertige Programmdatei, man baut sie wie unten.
+
 ## So gibst du Befehle ein
 
 1. Das Programm **Konsole** öffnen (im Startmenü nach „Konsole“ suchen).
@@ -41,6 +43,9 @@ cd ~/d6Downloader
 ```
 
 Das legt den Ordner `d6Downloader` in deinem persönlichen Ordner an.
+
+Wer eine bestimmte Version bauen will, gibt danach zum Beispiel `git checkout v0.3.1` ein. Vor dem späteren
+Aktualisieren dann zuerst `git switch main`.
 
 ## Schritt 3: Programm bauen
 
@@ -117,6 +122,11 @@ Die empfangenen Links erscheinen im Hinzufügen-Dialog und starten nie von selbs
 
 - Läuft gleichzeitig **JDownloader**, ist der Port 9666 belegt, und Click'n'Load bleibt aus. d6Downloader meldet das.
 - Mit einer echten Webseite noch nicht ausprobiert.
+
+## Schritt 8: Handy-App (freiwillig)
+
+Mit der Android-App [d6 Remote](https://github.com/d6njel/d6Remote) schickt man Links vom Handy an den PC. Installation
+und Hinweise stehen dort, das Koppeln in [DOKUMENTATION.md](DOKUMENTATION.md), Abschnitt 11.
 
 ## Aktualisieren
 

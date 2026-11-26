@@ -99,8 +99,8 @@ Link rechts anklicken. Lief d6Downloader nicht, wird es gestartet und bleibt off
 
 Voraussetzung ist ein **Premium-Konto**. Konten ohne Premium und Ordner-Links gehen vorerst nicht.
 
-**Die Anbindung wurde nie mit dem echten Rapidgator ausprobiert**, nur mit einer Nachbildung. Beim ersten Mal also mit
-einer kleinen Datei testen.
+**Mit einem echten Premium-Konto funktionieren Anmelden und Laden.** Zwei-Faktor-Anmeldung, automatischer Neu-Login und
+aufgebrauchter Traffic sind nur gegen eine Nachbildung geprüft. Beim ersten Mal mit einer kleinen Datei testen.
 
 Anmelden:
 
@@ -252,16 +252,20 @@ Automatisch geprüft sind Programmlogik und Fenster (ohne Bildschirm, gegen Attr
 in einer unsichtbaren KDE-Testsitzung gestartet: Browser-Aufruf bei geschlossenem Programm, Weiterlaufen nach dessen
 Ende, `--add`, zweiter Start, Beenden.
 
+**In Wirklichkeit benutzt:** Rapidgator mit einem echten Premium-Konto (Anmelden und Laden); Links vom Handy zum PC
+über den echten Server `ntfy.sh`, auch mit der verkleinerten App „d6 Remote“ 0.1.1.
+
 **Ungeprüft:**
 
-- Links vom Handy mit dem echten ntfy-Server, einem echten Handy, Mobilfunk und VPN (nur gegen Attrappen, Abschnitt 11)
+- Links vom Handy über Mobilfunk oder VPN, späteres Nachholen, wenn der PC aus war, ein Gerät entfernen, neu koppeln per
+  QR-Code mit der App 0.1.1, „Links vom Handy sofort starten“ (nur gegen Attrappen, Abschnitt 11)
 - Bedienung auf deinem echten Desktop (Maus, Tastatur, Hell/Dunkel, Skalierung), Eintrag und Symbol im Startmenü
 - Tray-Symbol, Benachrichtigungen, Zwischenablage-Überwachung, Drag & Drop aus dem Browser, Dateidialoge,
   „Im Ordner zeigen“, Click'n'Load
 - Wachhalten, Herunterfahren, Standby, Ruhezustand, Autostart nach dem Anmelden
 - die Erweiterung in einem echten Firefox oder Chrome (geprüft ist nur das Programm, so aufgerufen, wie der Browser es tut)
-- Rapidgator mit dem echten Dienst. Was die Schnittstellenbeschreibung nicht sagt (abgelaufene Anmeldung, aufgebrauchter
-  Traffic, Captcha), beruht auf Annahmen.
+- Rapidgator: Zwei-Faktor-Anmeldung, automatischer Neu-Login, aufgebrauchter Traffic. Was die Schnittstellenbeschreibung
+  nicht sagt (abgelaufene Anmeldung, aufgebrauchter Traffic, Captcha), beruht auf Annahmen.
 - AllDebrid mit dem echten Dienst
 - Archive nach dem Entpacken in den Papierkorb verschieben (ab Werk aus, braucht `gio`): mit einem echten Papierkorb
   ungeprüft
@@ -291,9 +295,14 @@ Kompression, beide Namensschemata), fehlende Teile, Beschädigung, Verknüpfunge
 
 ## 11. Links vom Handy
 
-Mit der Android-App **d6 Remote** schickt man vom Handy aus Links an den PC, auch unterwegs über Mobilfunk. Handy und PC
+Mit der Android-App **[d6 Remote](https://github.com/d6njel/d6Remote)** schickt man vom Handy aus Links an den PC.
+Gedacht ist das auch für unterwegs über Mobilfunk (noch nicht ausprobiert). Handy und PC
 bauen dafür nur ausgehende Verbindungen zu einem **ntfy-Server** auf (Standard `https://ntfy.sh`, ohne Konto). Am Router
 oder an der Firewall muss nichts geöffnet werden.
+
+Die fertige App (APK) liegt im [Release von d6 Remote](https://github.com/d6njel/d6Remote/releases). Sie ist nur mit
+einem Android-Debug-Schlüssel signiert (nicht für den Play Store, Play Protect kann warnen). Eine selbst gebaute APK
+kann sie nicht als Update ersetzen: vorher deinstallieren und neu koppeln.
 
 ### Einrichten
 

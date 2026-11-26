@@ -1,26 +1,27 @@
 # Changelog
 
-## d6Downloader 0.3.1 (in Arbeit, noch nicht veröffentlicht)
+## d6Downloader 0.3.1 (2026-11-27)
 
 ### Geändert
 
 - Einstellungen → Handy: „Entfernen“ und „Alle entfernen“ fragen vorher nach.
 - Dazu die App „d6 Remote“ 0.1.1: Nachfrage vor „Verlauf löschen“, „Erneut senden“ auch im Teilen-Dialog, viel kleinere APK.
-- Noch ungeprüft: die Rückfrage auf einem echten Bildschirm und die neue App auf einem echten Handy.
+- Doku: Rapidgator mit echtem Premium-Konto benutzt (Anmelden und Laden), Links vom Handy zum PC über das echte `ntfy.sh` benutzt, die verkleinerte App funktioniert.
+- Noch ungeprüft: die Rückfrage auf einem echten Bildschirm, neu koppeln per QR-Code mit der App 0.1.1, ein Gerät entfernen.
 
 ### Behoben
 
 - App „d6 Remote“: Kam eine Sendung trotz gemeldetem Fehler an und wurde erneut gesendet, blieb sie auf „wartet auf PC“. Die erste Rückmeldung wird jetzt gefunden.
 
-## d6Downloader 0.3.0 (in Arbeit, noch nicht veröffentlicht)
+## d6Downloader 0.3.0 (nicht einzeln veröffentlicht, enthalten in 0.3.1; Tag vorhanden)
 
 ### Neu
 
 - Links vom Handy annehmen (App „d6 Remote“ für Android): über einen ntfy-Server (Standard `https://ntfy.sh`), Ende-zu-Ende verschlüsselt, ab Werk aus. Koppeln per QR-Code unter Einstellungen → Handy, Geräte lassen sich dort entfernen.
 - Links vom Handy landen im Hinzufügen-Dialog. Auf Wunsch („Links vom Handy sofort starten“, ab Werk aus) starten unbedenkliche Links direkt; Unsicheres bleibt im Dialog, Ziele im eigenen Netz werden abgelehnt.
-- Noch ungeprüft: alles mit dem echten ntfy-Server und einem echten Handy (nur automatische Tests gegen Attrappen).
+- Stand zur Veröffentlichung: Senden vom Handy zum PC über das echte `ntfy.sh` funktioniert. Noch ungeprüft: Mobilfunk, Nachholen, wenn der PC aus war, Gerät entfernen, „sofort starten“.
 
-## d6Downloader 0.2.0 (in Arbeit, noch nicht veröffentlicht)
+## d6Downloader 0.2.0 (nicht einzeln veröffentlicht, enthalten in 0.3.1; Tag vorhanden)
 
 ### Geändert
 
@@ -43,7 +44,7 @@
 
 - Der Fortschrittsbalken der Download-Liste zeigte bei mehreren Verbindungen Teilstücke mit Lücken. Er füllt sich jetzt lückenlos von links nach dem Gesamtfortschritt, auch bei pausierten Downloads. Die Detailansicht zeigt die Verbindungen weiterhin einzeln.
 
-## d6Downloader 0.1.0 (in Arbeit, noch nicht veröffentlicht)
+## d6Downloader 0.1.0 (nicht einzeln veröffentlicht)
 
 Vorabfassung, siehe [README](README.md) und [DOKUMENTATION](DOKUMENTATION.md).
 

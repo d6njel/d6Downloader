@@ -5,3 +5,6 @@ Symbole: Fluent System Icons, (c) Microsoft Corporation, MIT-Lizenz. Oberfläche
 QR-Code: QRCoder, (c) Raffael Herrmann und Shane Krueger, MIT-Lizenz.
 
 App-Symbol: eigene Gestaltung.
+
+Testdaten aus libarchive (nur für Tests, nicht ausgeliefert), siehe
+[tests/D6Downloader.Tests/Fixtures/rar/COPYING](tests/D6Downloader.Tests/Fixtures/rar/COPYING).

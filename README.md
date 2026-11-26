@@ -39,6 +39,9 @@ cd ~/d6Downloader
 ./tools/install.sh
 ```
 
+Die Releases auf GitHub enthalten **keine fertige Programmdatei**: Man baut sie selbst, wie in
+[INSTALLATION.md](INSTALLATION.md) beschrieben.
+
 Die ausführliche Anleitung für Installation, Browser, Rapidgator, Deinstallation, Datenpfade und Sicherheitsgrenzen steht
 in **[DOKUMENTATION.md](DOKUMENTATION.md)**.
 
@@ -47,6 +50,12 @@ in **[DOKUMENTATION.md](DOKUMENTATION.md)**.
 Es ist eine Vorabfassung. **Automatisch geprüft** sind die Programmlogik und die Fenster (ohne Bildschirm, gegen
 Attrappen). Die fertige Programmdatei wurde in einer unsichtbaren KDE-Testsitzung gestartet (Browser-Aufruf, `--add`,
 zweiter Start, Beenden).
+
+**In Wirklichkeit benutzt:**
+
+- Rapidgator mit einem echten Premium-Konto: Anmelden und Laden
+- Links vom Handy: Senden vom Handy zum PC über den echten Server `ntfy.sh`, auch mit der verkleinerten App
+  „d6 Remote“ 0.1.1
 
 **Noch nicht in Wirklichkeit ausprobiert:**
 
@@ -59,7 +68,10 @@ zweiter Start, Beenden).
   laufenden Oberfläche
 - Wachhalten, Herunterfahren, Standby, Autostart
 - Browser-Erweiterung in einem echten Firefox und Chrome
-- Rapidgator (nur gegen eine Attrappe), AllDebrid (nur gegen eine Attrappe)
+- Rapidgator: Zwei-Faktor-Anmeldung, automatischer Neu-Login, aufgebrauchter Traffic (nur gegen eine Attrappe)
+- AllDebrid (nur gegen eine Attrappe)
+- Links vom Handy: über Mobilfunk, späteres Nachholen, wenn der PC aus war, ein Gerät entfernen, neu koppeln per
+  QR-Code mit der App 0.1.1, „Links vom Handy sofort starten“
 - Entpacken: verschlüsseltes RAR mit richtigem Passwort, komprimiertes mehrteiliges RAR 4 bis zum Ergebnis, große echte
   Pakete (Einzelheiten in [DOKUMENTATION.md](DOKUMENTATION.md), Abschnitt 9)
 
@@ -127,10 +139,12 @@ Ohne Fenster: `d6downloader --version`, `d6downloader --add <url>`,
 ## Rapidgator
 
 Der Knopf **Rapidgator** steht oben im Fenster (auch in den Einstellungen unter „Konten“). Dort gibt man E-Mail und
-Passwort ein und sieht danach, wie lange Premium läuft und wie viel Traffic übrig ist. **Die Anbindung wurde nie mit
-dem echten Rapidgator ausprobiert**: Grundlage ist die Schnittstellenbeschreibung in
-[docs/rapidgator-api-v2.md](docs/rapidgator-api-v2.md) und eine nachgebaute Attrappe auf dem eigenen Rechner. Was die
-Beschreibung nicht sagt (abgelaufene Anmeldung, aufgebrauchter Traffic, Captcha), beruht auf Annahmen.
+Passwort ein und sieht danach, wie lange Premium läuft und wie viel Traffic übrig ist. **Mit einem echten
+Premium-Konto funktionieren Anmelden und Laden.** Nicht in Wirklichkeit ausprobiert sind die Zwei-Faktor-Anmeldung, der
+automatische Neu-Login und aufgebrauchter Traffic. Grundlage ist die Schnittstellenbeschreibung in
+[docs/rapidgator-api-v2.md](docs/rapidgator-api-v2.md), automatisch geprüft wird gegen eine nachgebaute Attrappe auf dem
+eigenen Rechner. Was die Beschreibung nicht sagt (abgelaufene Anmeldung, aufgebrauchter Traffic, Captcha), beruht auf
+Annahmen.
 
 Voraussetzung: ein **Premium-Konto** bei Rapidgator. Konten ohne Premium und Ordner-Links sind vorerst nicht vorgesehen.
 
@@ -163,9 +177,21 @@ Passwort entschlüsseln.
 Mit eingeschalteter 2FA kann sich das Programm nach Ablauf der Anmeldung nicht allein neu anmelden, dann wird wieder
 ein Code gebraucht. Die E-Mail-Adresse steht unverschlüsselt in den Einstellungen.
 
+## Links vom Handy (App d6 Remote)
+
+Mit der Android-App **[d6 Remote](https://github.com/d6njel/d6Remote)** schickt man Links vom Handy an den PC. Die
+Funktion ist ab Werk aus; gekoppelt wird unter Einstellungen, Zeile „Handy“.
+
+Die Nachrichten laufen über einen **fremden ntfy-Server** (Standard `https://ntfy.sh`, nicht von diesem Projekt
+betrieben). Die Inhalte sind Ende-zu-Ende verschlüsselt, der Server sieht aber IP-Adressen, Zeitpunkte, Größen und
+Kanalnamen. Ein eigener ntfy-Server ist möglich. Einzelheiten in [DOKUMENTATION.md](DOKUMENTATION.md), Abschnitt 11.
+
+Die APK der App ist nur mit einem Android-Debug-Schlüssel signiert, siehe
+[README von d6 Remote](https://github.com/d6njel/d6Remote#readme).
+
 ## Hinweis
 
-d6Downloader ist ein unabhängiges Projekt und gehört nicht zu Rapidgator, AllDebrid, JDownloader oder Apple. Die Namen
+d6Downloader ist ein unabhängiges Projekt und gehört nicht zu Rapidgator, AllDebrid, JDownloader, ntfy oder Apple. Die Namen
 dienen nur dazu, die Verträglichkeit zu beschreiben. Nur für erlaubte Inhalte gedacht; für das, was man herunterlädt,
 ist man selbst verantwortlich.
 
