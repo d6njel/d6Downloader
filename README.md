@@ -4,6 +4,10 @@ d6Downloader ist ein Download-Manager für Linux: Links sammeln, mehrteilige Arc
 Dateien mit mehreren Verbindungen laden, anhalten und fortsetzen, danach automatisch entpacken.
 Entwickelt und geprüft wird er unter Nobara/Fedora 44 (KDE).
 
+> **Installieren auf Fedora mit KDE:** Schritt-für-Schritt-Anleitung für Einsteiger in
+> **[INSTALLATION.md](INSTALLATION.md)**. Nur für Linux: Die Windows-Fassung ist das Original
+> [YDownloader](https://github.com/yusa1905/YDownloader).
+
 ![Hauptfenster](docs/screenshots/main-dark.png)
 
 Die Bilder in [docs/screenshots](docs/screenshots) sind ohne Bildschirm gezeichnet, alle Daten darin sind ausgedacht.
@@ -26,7 +30,7 @@ Alle Bilder:
 
 ## Installieren
 
-Ohne sudo (vorher einmalig die Werkzeuge einschließlich `git`, siehe unten).
+Kurzfassung. Ausführlich, Schritt für Schritt: **[INSTALLATION.md](INSTALLATION.md)**. Ohne sudo (vorher einmalig die Werkzeuge einschließlich `git`, siehe unten).
 
 ```
 git clone https://github.com/d6njel/d6Downloader.git ~/d6Downloader
