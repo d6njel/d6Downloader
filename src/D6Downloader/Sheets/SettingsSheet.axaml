@@ -73,6 +73,9 @@
                     <StackPanel Grid.Row="6" Grid.Column="1" Margin="0,0,0,6" Spacing="4">
                         <CheckBox x:Name="AutoExtractBox" Content="{l:Str Settings.AutoExtract}" ToolTip.Tip="{l:Str Settings.AutoExtractTip}"/>
                         <CheckBox x:Name="DeleteArchivesBox" Content="{l:Str Settings.DeleteArchives}" ToolTip.Tip="{l:Str Settings.DeleteArchivesTip}"/>
+                        <CheckBox x:Name="DeletePermanentlyBox" Margin="28,0,0,0" ToolTip.Tip="{l:Str Settings.DeleteArchivesPermanentlyTip}">
+                            <TextBlock Text="{l:Str Settings.DeleteArchivesPermanently}" TextWrapping="Wrap"/>
+                        </CheckBox>
                         <TextBox x:Name="SevenZipBox" PlaceholderText="{l:Str Settings.SevenZipHint}"/>
                     </StackPanel>
 

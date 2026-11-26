@@ -130,9 +130,19 @@ die Option darunter ein.
   mindestens eine Datei herauskam.
 - In den Papierkorb kommen alle Teile des Archivs aus der Download-Liste, andere Dateien (etwa `.nfo`) nie.
 - Eine Datei, die seit Beginn des Entpackens verändert wurde oder eine Verknüpfung ist, bleibt liegen. Ebenso, wenn der
-  Papierkorb nicht geht (etwa auf manchen Netzlaufwerken). Endgültig gelöscht wird nie. Das Protokoll des Downloads nennt,
-  wie viele Dateien verschoben oder behalten wurden.
+  Papierkorb nicht geht (etwa auf manchen Netzlaufwerken). Ohne das Unterhäkchen darunter wird nie endgültig gelöscht.
+  Das Protokoll des Downloads nennt, wie viele Dateien verschoben oder behalten wurden.
 - Der Platz wird erst frei, wenn du den Papierkorb leerst. Gebraucht wird dafür `gio` (Teil von `glib2`).
+
+**Stattdessen endgültig löschen (nicht rückgängig zu machen)** (Unterhäkchen dazu, ab Werk aus):
+
+- Wählbar nur, wenn die Option darüber an ist. Wird diese abgewählt, ist auch das Unterhäkchen wieder aus.
+- Die Archivteile werden **ohne Papierkorb** gelöscht. Es gibt kein Zurück. Der Platz ist sofort frei, `gio` wird dafür
+  nicht gebraucht.
+- Nur nach vollständig geglücktem Entpacken und nur, wenn **alle** Teile noch unverändert da sind und keiner eine
+  Verknüpfung ist. Sonst bleiben alle Teile liegen. Andere Dateien werden nie gelöscht.
+- Lässt sich nach dieser Prüfung ein einzelner Teil nicht löschen, bleibt er liegen, die übrigen werden gelöscht. Das
+  Protokoll des Downloads nennt, wie viele Dateien gelöscht oder behalten wurden.
 
 | Archiv | Programm |
 |---|---|
@@ -245,6 +255,8 @@ Ende, `--add`, zweiter Start, Beenden.
 - AllDebrid mit dem echten Dienst
 - Archive nach dem Entpacken in den Papierkorb verschieben (ab Werk aus, braucht `gio`): mit einem echten Papierkorb
   ungeprüft
+- Archive nach dem Entpacken endgültig löschen (ab Werk aus): nur automatisch geprüft, nicht mit echten Paketen in der
+  laufenden Oberfläche
 
 **Entpacken von RAR:** Automatisch geprüft mit dem echten `unar` 1.10.7 an Testdateien aus libarchive und an kleinen
 selbst erzeugten Archiven: einteilig (RAR 4 und 5), mehrteilig RAR 5, mehrteilig RAR 4 (nur selbst erzeugt, ohne

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using D6Downloader.Packages;
@@ -51,9 +52,10 @@ public class ArchiveCleanupTests
         var stamps = ArchiveCleanup.Stamp(Files(dir, "a.zip"));
         var moved = new List<string>();
 
-        var counts = ArchiveCleanup.Remove(stamps, new ExtractResult(state, failure, Files: files), moved.Add, CancellationToken.None);
+        var result = new ExtractResult(state, failure, Files: files);
 
-        Assert.Equal((0, 0), counts);
+        Assert.Equal((0, 0), ArchiveCleanup.Remove(stamps, result, moved.Add, CancellationToken.None));
+        Assert.Equal((0, 0), ArchiveCleanup.Remove(stamps, result, moved.Add, CancellationToken.None, allOrNothing: true));
         Assert.Empty(moved);
     }
 
@@ -117,5 +119,115 @@ public class ArchiveCleanupTests
 
         Assert.Equal((1, 1), counts);
         Assert.Single(moved);
+    }
+
+    [Fact]
+    public void All_or_nothing_deletes_every_part_and_nothing_else()
+    {
+        using var dir = new TempDir();
+        string[] parts = Files(dir, "a.7z.001", "a.7z.002", "a.7z.003");
+        string neighbour = Files(dir, "a.nfo")[0];
+
+        var counts = ArchiveCleanup.Remove(ArchiveCleanup.Stamp(parts), Done, File.Delete, CancellationToken.None, allOrNothing: true);
+
+        Assert.Equal((3, 0), counts);
+        Assert.All(parts, p => Assert.False(File.Exists(p)));
+        Assert.True(File.Exists(neighbour));
+    }
+
+    [Theory]
+    [InlineData("changed")]
+    [InlineData("missing")]
+    [InlineData("link")]
+    [InlineData("never")]
+    public void All_or_nothing_keeps_everything_if_one_part_is_not_untouched(string problem)
+    {
+        using var dir = new TempDir();
+        string[] parts = Files(dir, "a.7z.001", "a.7z.002", "a.7z.003");
+        string target = Files(dir, "target")[0];
+        if (problem == "never") File.Delete(parts[2]);
+        var stamps = ArchiveCleanup.Stamp(parts);
+        if (problem == "changed") File.AppendAllText(parts[2], "x");
+        if (problem == "missing") File.Delete(parts[2]);
+        if (problem == "link")
+        {
+            File.Delete(parts[2]);
+            File.CreateSymbolicLink(parts[2], target);
+        }
+        var deleted = new List<string>();
+
+        var counts = ArchiveCleanup.Remove(stamps, Done, deleted.Add, CancellationToken.None, allOrNothing: true);
+
+        Assert.Equal((0, 3), counts);
+        Assert.Empty(deleted);
+        Assert.True(File.Exists(parts[0]));
+        Assert.True(File.Exists(parts[1]));
+        Assert.True(File.Exists(target));
+    }
+
+    [Fact]
+    public void All_or_nothing_does_not_start_when_already_cancelled()
+    {
+        using var dir = new TempDir();
+        string[] parts = Files(dir, "a.7z.001", "a.7z.002");
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        var counts = ArchiveCleanup.Remove(ArchiveCleanup.Stamp(parts), Done, File.Delete, cts.Token, allOrNothing: true);
+
+        Assert.Equal((0, 2), counts);
+        Assert.All(parts, p => Assert.True(File.Exists(p)));
+    }
+
+    [Fact]
+    public void All_or_nothing_finishes_when_cancelled_while_deleting()
+    {
+        using var dir = new TempDir();
+        string[] parts = Files(dir, "a.7z.001", "a.7z.002", "a.7z.003");
+        using var cts = new CancellationTokenSource();
+
+        var counts = ArchiveCleanup.Remove(ArchiveCleanup.Stamp(parts), Done, p => { File.Delete(p); cts.Cancel(); }, cts.Token,
+            allOrNothing: true);
+
+        Assert.Equal((3, 0), counts);
+        Assert.All(parts, p => Assert.False(File.Exists(p)));
+    }
+
+    [Fact]
+    public void All_or_nothing_goes_on_after_a_file_that_cannot_be_deleted()
+    {
+        using var dir = new TempDir();
+        string[] parts = Files(dir, "a.7z.001", "a.7z.002", "a.7z.003");
+
+        var counts = ArchiveCleanup.Remove(ArchiveCleanup.Stamp(parts), Done, p =>
+        {
+            if (p == parts[1]) throw new UnauthorizedAccessException("nein");
+            File.Delete(p);
+        }, CancellationToken.None, allOrNothing: true);
+
+        Assert.Equal((2, 1), counts);
+        Assert.Equal(new[] { false, true, false }, parts.Select(File.Exists));
+    }
+
+    /// <summary>Entpackt das Archiv in den eigenen Ordner, muss der Eintrag ausweichen: Gelöscht wird das Archiv, nie das Entpackte.</summary>
+    [Fact]
+    public void An_extracted_file_with_the_name_of_the_archive_stays()
+    {
+        using var dir = new TempDir();
+        string archive = dir.File("a.zip");
+        using (var zip = ZipFile.Open(archive, ZipArchiveMode.Create))
+        {
+            using var writer = new StreamWriter(zip.CreateEntry("a.zip").Open());
+            writer.Write("hallo");
+        }
+        var stamps = ArchiveCleanup.Stamp(new[] { archive });
+        var result = new ArchiveExtractor(() => null, () => null, _ => long.MaxValue)
+            .Run(new ExtractJob(archive, dir.Path, ArchiveType.Zip, false, new[] { archive }), CancellationToken.None);
+
+        var counts = ArchiveCleanup.Remove(stamps, result, File.Delete, CancellationToken.None, allOrNothing: true);
+
+        Assert.Equal((1, 0), counts);
+        Assert.False(File.Exists(archive));
+        Assert.Equal("hallo", File.ReadAllText(dir.File("a (1).zip")));
     }
 }

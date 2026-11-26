@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -143,6 +144,132 @@ public class DownloadManagerSmokeTests
             Assert.Equal(expected, item.Log.Any(l => l.Text == Loc.T("Extract.Log.ArchivesTrashed", 1)));
             Assert.Equal(expected ? "trashed" : null, broken ? null : item.ExtractDetail);
             if (!broken) Assert.True(File.Exists(Path.Combine(ExtractPlanner.SingleTargetDir(archive), "inhalt.txt")));
+            manager.Shutdown();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+    }
+
+    [Theory]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
+    [InlineData(false, true, false)]
+    public void Archives_are_deleted_permanently_only_with_both_options_and_success(bool afterExtract, bool permanently, bool broken)
+    {
+        using var dir = new TempDir();
+        string archive = dir.File("a.zip");
+        if (broken) File.WriteAllText(archive, "kein ZIP");
+        else WriteZip(archive, "inhalt.txt");
+        bool expected = afterExtract && permanently && !broken;
+
+        Extract(dir, archive, afterExtract, permanently, (item, trash) =>
+        {
+            Assert.Equal(broken ? ExtractState.Failed : ExtractState.Done, item.Extract);
+            Assert.Empty(trash.Moved);
+            Assert.Equal(!expected, File.Exists(archive));
+            Assert.Equal(expected, item.Log.Any(l => l.Text == Loc.T("Extract.Log.ArchivesDeleted", 1)));
+            if (!broken) Assert.Equal(expected ? "deleted" : null, item.ExtractDetail);
+        });
+    }
+
+    /// <summary>Gegen ein echtes 7-Zip; ohne eines prüft der Test nichts.</summary>
+    [Fact]
+    public void A_missing_or_wrong_password_deletes_nothing_and_the_right_one_deletes_all_parts()
+    {
+        if (ToolLocator.FindSevenZip(null, ToolSearchEnv.Current(Array.Empty<string>())) is not { } sevenZip) return;
+        using var dir = new TempDir();
+        using var source = new TempDir();
+        var data = new byte[20_000];
+        new Random(1).NextBytes(data); // nicht komprimierbar: mehrere Teile
+        File.WriteAllBytes(source.File("data.bin"), data);
+        var start = new ProcessStartInfo(sevenZip) { UseShellExecute = false, RedirectStandardOutput = true };
+        foreach (string a in new[] { "a", "-pRichtig 1", "-v6k", dir.File("pack.7z"), source.File("data.bin") }) start.ArgumentList.Add(a);
+        using (var process = Process.Start(start)!)
+        {
+            process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            Assert.Equal(0, process.ExitCode);
+        }
+        string[] parts = Directory.GetFiles(dir.Path, "pack.7z.*").Order().ToArray();
+        Assert.True(parts.Length > 1);
+
+        var previous = SynchronizationContext.Current;
+        var ui = new QueueContext();
+        SynchronizationContext.SetSynchronizationContext(ui);
+        try
+        {
+            var trash = new FakeTrash();
+            var manager = new DownloadManager(new FakeTimers(), ui, trash: trash);
+            manager.Settings.DeleteArchivesAfterExtract = true;
+            manager.Settings.DeleteArchivesPermanently = true;
+            manager.Settings.ArchivePasswords.Passwords = new();
+            var items = parts.Select(p => new DownloadItem("http://127.0.0.1:1/" + Path.GetFileName(p), Path.GetFileName(p), dir.Path)
+            { PackageId = "pack", PackageName = "pack" }).ToList();
+            manager.Add(items, start: false);
+            for (int i = 0; i < parts.Length; i++)
+            {
+                items[i].Status = DownloadStatus.Completed;
+                items[i].FinalPath = parts[i];
+            }
+            void Wait() => ui.RunUntil(() => items[0].Extract is not (ExtractState.None or ExtractState.Extracting));
+
+            manager.ExtractNow(items);
+            Wait();
+            Assert.Equal(ExtractState.NeedPassword, items[0].Extract);
+            Assert.All(parts, p => Assert.True(File.Exists(p)));
+
+            manager.EnterPassword(items, "falsch", remember: false);
+            Wait();
+            Assert.Equal(ExtractState.NeedPassword, items[0].Extract);
+            Assert.Equal("1", items[0].ExtractDetail); // das falsche wurde wirklich probiert
+            Assert.All(parts, p => Assert.True(File.Exists(p)));
+            Assert.False(File.Exists(dir.File("data.bin")));
+
+            manager.EnterPassword(items, "Richtig 1", remember: false);
+            Wait();
+            Assert.Equal(ExtractState.Done, items[0].Extract);
+            Assert.Equal("deleted", items[0].ExtractDetail);
+            Assert.Equal(data, File.ReadAllBytes(dir.File("data.bin")));
+            Assert.All(parts, p => Assert.False(File.Exists(p)));
+            Assert.Empty(trash.Moved);
+            manager.Shutdown();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+    }
+
+    private static void WriteZip(string path, string entry)
+    {
+        using var zip = ZipFile.Open(path, ZipArchiveMode.Create);
+        using var writer = new StreamWriter(zip.CreateEntry(entry).Open());
+        writer.Write("hallo");
+    }
+
+    private static void Extract(TempDir dir, string archive, bool afterExtract, bool permanently,
+        Action<DownloadItem, FakeTrash> check)
+    {
+        var previous = SynchronizationContext.Current;
+        var ui = new QueueContext();
+        SynchronizationContext.SetSynchronizationContext(ui);
+        try
+        {
+            var trash = new FakeTrash();
+            var manager = new DownloadManager(new FakeTimers(), ui, tools: NoToolLocator.Instance, trash: trash);
+            manager.Settings.DeleteArchivesAfterExtract = afterExtract;
+            manager.Settings.DeleteArchivesPermanently = permanently;
+            var item = new DownloadItem("http://127.0.0.1:1/a.zip", "a.zip", dir.Path);
+            manager.Add(new[] { item }, start: false);
+            item.Status = DownloadStatus.Completed;
+            item.FinalPath = archive;
+
+            manager.ExtractNow(new[] { item });
+            ui.RunUntil(() => item.Extract is not (ExtractState.None or ExtractState.Extracting));
+
+            check(item, trash);
             manager.Shutdown();
         }
         finally

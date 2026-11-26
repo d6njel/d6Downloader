@@ -138,9 +138,15 @@ public sealed class AppSettings
 
     /// <summary>
     /// Nach vollständig geglücktem Entpacken (automatisch oder von Hand) die Teile des Archivs in den Papierkorb verschieben,
-    /// siehe <c>ArchiveCleanup</c>. Ab Werk aus, nie endgültiges Löschen.
+    /// siehe <c>ArchiveCleanup</c>. Ab Werk aus. Endgültig gelöscht wird nur, wenn zusätzlich <see cref="DeleteArchivesPermanently"/> an ist.
     /// </summary>
     public bool DeleteArchivesAfterExtract { get; set; }
+
+    /// <summary>
+    /// Die Teile endgültig löschen statt in den Papierkorb zu verschieben, nur alle zusammen oder keinen. Wirkt nur zusammen mit
+    /// <see cref="DeleteArchivesAfterExtract"/>. Ab Werk aus.
+    /// </summary>
+    public bool DeleteArchivesPermanently { get; set; }
 
     /// <summary>Pfad zu 7-Zip (<c>7zz</c>, <c>7z</c>, <c>7za</c>) oder dem Ordner davon. Leer = suchen, erst beim ersten Entpacken.</summary>
     public string? SevenZipPath { get; set; }

@@ -8,7 +8,12 @@ public static class ExtractText
     public static string Describe(ExtractState state, ExtractFailure reason, string? detail) => state switch
     {
         ExtractState.Extracting => Loc.T("Extract.Running"),
-        ExtractState.Done => Loc.T(detail == "trashed" ? "Extract.DoneTrashed" : "Extract.Done"),
+        ExtractState.Done => Loc.T(detail switch
+        {
+            "trashed" => "Extract.DoneTrashed",
+            "deleted" => "Extract.DoneDeleted",
+            _ => "Extract.Done",
+        }),
         ExtractState.NeedSevenZip => Loc.T("Extract.NeedSevenZip"),
         ExtractState.NeedRarTool => Loc.T("Extract.NeedRarTool"),
         ExtractState.NeedPassword => detail is { Length: > 0 } ? Loc.T("Extract.NeedPasswordTried", detail) : Loc.T("Extract.NeedPassword"),

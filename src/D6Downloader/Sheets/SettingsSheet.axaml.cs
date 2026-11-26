@@ -57,6 +57,9 @@ public partial class SettingsSheet : UserControl
         KeepAwakeBox.IsChecked = s.KeepAwake;
         AutoExtractBox.IsChecked = s.AutoExtract;
         DeleteArchivesBox.IsChecked = s.DeleteArchivesAfterExtract;
+        DeletePermanentlyBox.IsChecked = s.DeleteArchivesPermanently;
+        DeleteArchivesBox.IsCheckedChanged += (_, _) => UpdateDeletePermanently();
+        UpdateDeletePermanently();
         SevenZipBox.Text = s.SevenZipPath ?? "";
         UnarPasswordBox.IsChecked = s.AllowUnarPasswordOnCommandLine;
         ClickNLoadBox.IsChecked = s.ClickNLoad;
@@ -89,6 +92,14 @@ public partial class SettingsSheet : UserControl
         var assembly = typeof(SettingsSheet).Assembly;
         using var reader = new StreamReader(assembly.GetManifestResourceStream("NOTICE.md")!);
         return $"d6Downloader {assembly.GetName().Version?.ToString(3)}\n{reader.ReadToEnd().Trim()}";
+    }
+
+    // Das Unterhäkchen gibt es nur zusammen mit dem oberen: Wer dieses abwählt, wählt auch das endgültige Löschen ab.
+    private void UpdateDeletePermanently()
+    {
+        bool on = DeleteArchivesBox.IsChecked == true;
+        DeletePermanentlyBox.IsEnabled = on;
+        if (!on) DeletePermanentlyBox.IsChecked = false;
     }
 
     public static void Open(MainWindow host) => host.ShowSheet(new SettingsSheet(host));
@@ -194,6 +205,7 @@ public partial class SettingsSheet : UserControl
         s.KeepAwake = KeepAwakeBox.IsChecked == true;
         s.AutoExtract = AutoExtractBox.IsChecked == true;
         s.DeleteArchivesAfterExtract = DeleteArchivesBox.IsChecked == true;
+        s.DeleteArchivesPermanently = s.DeleteArchivesAfterExtract && DeletePermanentlyBox.IsChecked == true;
         s.AllowUnarPasswordOnCommandLine = UnarPasswordBox.IsChecked == true;
         s.SevenZipPath = sevenZip.Length > 0 ? sevenZip : null;
         s.NotifyCompleted = NotifyCompletedBox.IsChecked == true;

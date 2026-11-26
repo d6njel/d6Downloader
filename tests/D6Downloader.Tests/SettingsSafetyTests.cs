@@ -91,6 +91,20 @@ public class SettingsSafetyTests
     }
 
     [Fact]
+    public void Deleting_archives_permanently_is_off_by_default_and_survives_a_round_trip()
+    {
+        using var dir = new TempDir();
+        string path = dir.File("settings.json");
+        Assert.False(new AppSettings().DeleteArchivesPermanently);
+        File.WriteAllText(path, "{}");
+        Assert.False(AppSettings.Load(path, NoPause).DeleteArchivesPermanently);
+
+        AppSettings.Write(path, new AppSettings { DeleteArchivesPermanently = true }.ToJson());
+
+        Assert.True(AppSettings.Load(path, NoPause).DeleteArchivesPermanently);
+    }
+
+    [Fact]
     public async Task Writer_keeps_the_newest_state_when_saves_pile_up()
     {
         using var dir = new TempDir();

@@ -1,5 +1,12 @@
 # Changelog
 
+## d6Downloader 0.2.0 (in Arbeit, noch nicht veröffentlicht)
+
+### Neu
+
+- Unterhäkchen „Stattdessen endgültig löschen (nicht rückgängig zu machen)“ unter „Archive nach dem Entpacken in den Papierkorb verschieben“ (ab Werk aus, braucht kein `gio`): Die Archivteile werden nur gelöscht, wenn das Entpacken vollständig geklappt hat und alle Teile unverändert sind, sonst bleiben alle liegen. Andere Dateien werden nie gelöscht.
+- Noch ungeprüft: das endgültige Löschen mit echten Paketen in der laufenden Oberfläche (nur automatische Tests).
+
 ## d6Downloader 0.1.1 (2026-11-26)
 
 ### Behoben

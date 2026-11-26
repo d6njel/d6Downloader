@@ -55,6 +55,8 @@ zweiter Start, Beenden).
   „Im Ordner zeigen“, Click'n'Load
 - Archive nach dem Entpacken in den Papierkorb verschieben (ab Werk aus, braucht `gio`): mit einem echten Papierkorb
   ungeprüft
+- Archive nach dem Entpacken endgültig löschen (ab Werk aus): nur automatisch geprüft, nicht mit echten Paketen in der
+  laufenden Oberfläche
 - Wachhalten, Herunterfahren, Standby, Autostart
 - Browser-Erweiterung in einem echten Firefox und Chrome
 - Rapidgator (nur gegen eine Attrappe), AllDebrid (nur gegen eine Attrappe)
@@ -64,6 +66,9 @@ zweiter Start, Beenden).
 **Entpacken:** ZIP und 7z wie gehabt (eingebaut bzw. 7-Zip), RAR mit `unar`/`lsar`, weil das 7-Zip von Fedora kein RAR
 kann. Passwortgeschützte RAR brauchen eine Einstellung, die ab Werk aus ist: `unar` nimmt das Passwort nur auf der
 Befehlszeile an, wo es in der Prozessliste sichtbar ist.
+
+**Archive aufräumen:** Nach vollständig geglücktem Entpacken können die Archivteile in den Papierkorb verschoben oder,
+mit einem zusätzlichen Häkchen, endgültig gelöscht werden (nicht rückgängig zu machen). Beides ist ab Werk aus.
 
 **Einschränkungen:**
 

@@ -191,6 +191,43 @@ public class MainWindowTests
     }
 
     [AvaloniaFact]
+    public async Task Deleting_permanently_is_only_available_together_with_removing_archives()
+    {
+        using var ui = new Ui();
+        SettingsSheet.Open(ui.Window);
+        var sheet = ui.Sheet<SettingsSheet>();
+        var remove = Ui.Find<CheckBox>(sheet, "DeleteArchivesBox");
+        var permanently = Ui.Find<CheckBox>(sheet, "DeletePermanentlyBox");
+        Assert.False(permanently.IsEnabled);
+        Assert.False(permanently.IsChecked);
+
+        remove.IsChecked = true;
+        Assert.True(permanently.IsEnabled);
+        Assert.False(permanently.IsChecked);
+        permanently.IsChecked = true;
+        remove.IsChecked = false;
+        Assert.False(permanently.IsEnabled);
+        Assert.False(permanently.IsChecked);
+
+        remove.IsChecked = true;
+        permanently.IsChecked = true;
+        Ui.Click(sheet, "SaveButton");
+        await Ui.WaitUntil(() => !ui.Window.IsSheetOpen, "Speichern");
+        Assert.True(ui.Downloads.Settings.DeleteArchivesAfterExtract);
+        Assert.True(ui.Downloads.Settings.DeleteArchivesPermanently);
+
+        SettingsSheet.Open(ui.Window);
+        sheet = ui.Sheet<SettingsSheet>();
+        Assert.True(Ui.Find<CheckBox>(sheet, "DeletePermanentlyBox").IsEnabled);
+        Assert.True(Ui.Find<CheckBox>(sheet, "DeletePermanentlyBox").IsChecked);
+        Ui.Find<CheckBox>(sheet, "DeleteArchivesBox").IsChecked = false;
+        Ui.Click(sheet, "SaveButton");
+        await Ui.WaitUntil(() => !ui.Window.IsSheetOpen, "Speichern");
+        Assert.False(ui.Downloads.Settings.DeleteArchivesAfterExtract);
+        Assert.False(ui.Downloads.Settings.DeleteArchivesPermanently);
+    }
+
+    [AvaloniaFact]
     public void The_browser_is_registered_only_on_click_and_only_in_the_given_folder()
     {
         using var ui = new Ui();

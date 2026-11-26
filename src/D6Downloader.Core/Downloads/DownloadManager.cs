@@ -1249,14 +1249,16 @@ public sealed class DownloadManager
             UpdateKeepAwake();
 
             ExtractResult? result;
-            int trashed = 0, kept = 0;
-            bool trashArchives = Settings.DeleteArchivesAfterExtract; // gilt für diesen Auftrag, auch wenn inzwischen umgestellt wird
+            int removed = 0, kept = 0;
+            // Beides gilt für diesen Auftrag, auch wenn inzwischen umgestellt wird.
+            bool trashArchives = Settings.DeleteArchivesAfterExtract;
+            bool permanently = trashArchives && Settings.DeleteArchivesPermanently;
             try
             {
                 // Aufräumen im selben Auftrag: So warten Beenden, Wachhalten und „Nach Abschluss“ auch darauf.
-                var task = Task.Run(() => ExtractAndCleanUp(extractor, job, trashArchives, cts.Token));
+                var task = Task.Run(() => ExtractAndCleanUp(extractor, job, trashArchives, permanently, cts.Token));
                 _extractTask = task;
-                (result, trashed, kept) = await task;
+                (result, removed, kept) = await task;
             }
             catch (OperationCanceledException)
             {
@@ -1283,8 +1285,10 @@ public sealed class DownloadManager
             if (result.State == ExtractState.Done)
             {
                 group[entry].LogNote(Loc.T("Extract.Log.Done", result.Files, target));
-                if (trashed > 0) group[entry].LogNote(Loc.T("Extract.Log.ArchivesTrashed", trashed));
-                if (kept > 0) group[entry].LogNote(Loc.T("Extract.Log.ArchivesKept", kept));
+                if (removed > 0)
+                    group[entry].LogNote(Loc.T(permanently ? "Extract.Log.ArchivesDeleted" : "Extract.Log.ArchivesTrashed", removed));
+                if (kept > 0)
+                    group[entry].LogNote(Loc.T(permanently ? "Extract.Log.ArchivesKeptDelete" : "Extract.Log.ArchivesKept", kept));
                 if (entered.Remember && result.UsedPassword is not null && result.UsedPassword == entered.Password)
                     RememberPassword(group[entry], result.UsedPassword);
             }
@@ -1301,28 +1305,29 @@ public sealed class DownloadManager
         }
     }
 
-    /// <summary>Läuft im Hintergrund: entpacken und, falls gewünscht, danach die Teile des Archivs in den Papierkorb verschieben.</summary>
-    private (ExtractResult Result, int Trashed, int Kept) ExtractAndCleanUp(ArchiveExtractor extractor, ExtractJob job,
-        bool trashArchives, CancellationToken ct)
+    /// <summary>Läuft im Hintergrund: entpacken und, falls gewünscht, danach die Teile des Archivs in den Papierkorb verschieben oder löschen.</summary>
+    private (ExtractResult Result, int Removed, int Kept) ExtractAndCleanUp(ArchiveExtractor extractor, ExtractJob job,
+        bool removeArchives, bool permanently, CancellationToken ct)
     {
-        if (!trashArchives) return (extractor.Run(job, ct), 0, 0);
+        if (!removeArchives) return (extractor.Run(job, ct), 0, 0);
 
         var stamps = ArchiveCleanup.Stamp(job.PartPaths);
         var result = extractor.Run(job, ct);
-        int trashed = 0, kept;
+        Action<string> remove = permanently ? File.Delete : _trash.MoveToTrash;
+        int removed = 0, kept;
         try
         {
             kept = ArchiveCleanup.Remove(stamps, result, path =>
             {
-                _trash.MoveToTrash(path);
-                trashed++;
-            }, ct).Kept;
+                remove(path);
+                removed++;
+            }, ct, allOrNothing: permanently).Kept;
         }
         catch (Exception)
         {
-            kept = stamps.Count - trashed; // das Entpacken ist geglückt, ein Fehler beim Aufräumen ändert daran nichts
+            kept = stamps.Count - removed; // das Entpacken ist geglückt, ein Fehler beim Aufräumen ändert daran nichts
         }
-        return (trashed > 0 ? result with { Detail = "trashed" } : result, trashed, kept);
+        return (removed > 0 ? result with { Detail = permanently ? "deleted" : "trashed" } : result, removed, kept);
     }
 
     /// <summary>Das eingegebene Passwort hat gepasst und der Nutzer wollte es merken: an die Liste in den Einstellungen anhängen.</summary>
