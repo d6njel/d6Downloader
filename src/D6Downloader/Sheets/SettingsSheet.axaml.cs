@@ -5,8 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using D6Downloader.Downloads;
 using D6Downloader.Packages;
+using D6Downloader.Remote;
+using D6Downloader.Services;
 
 namespace D6Downloader.Sheets;
 
@@ -84,6 +87,153 @@ public partial class SettingsSheet : UserControl
         NotifyFailedBox.IsChecked = s.NotifyFailed;
         NotifyAllDoneBox.IsChecked = s.NotifyAllDone;
         AboutText.Text = AboutNotice();
+        InitRemote(s.Remote);
+    }
+
+    // ---------------------------------------------------------------- Handy
+
+    private PairingSession? _pairing;
+    private DispatcherTimer? _countdown;
+
+    private void InitRemote(RemoteSettings remote)
+    {
+        RemoteBox.IsChecked = remote.Enabled;
+        RemoteAutoBox.IsChecked = remote.AutoStart;
+        RemoteServerBox.Text = remote.ServerUrl == RemoteSettings.DefaultServer ? "" : remote.ServerUrl;
+        AttachedToVisualTree += (_, _) =>
+        {
+            _host.App.RemoteChanged += UpdateRemote;
+            UpdateRemote();
+        };
+        // Sheet zu heißt: Pairing abgebrochen, der Seed ist weg.
+        DetachedFromVisualTree += (_, _) =>
+        {
+            _host.App.RemoteChanged -= UpdateRemote;
+            EndPairing(cancel: true);
+        };
+        UpdateRemote();
+    }
+
+    private void UpdateRemote()
+    {
+        var remote = _downloads.Settings.Remote;
+        RemoteStatusText.Text = _host.App.RemoteStatusText;
+
+        if (_pairing is { } session && !session.IsOpen(DateTimeOffset.UtcNow))
+        {
+            var keys = session.Keys;
+            var paired = remote.Devices.Find(d => d.DeviceId == keys.DeviceId);
+            if (paired is not null || DateTimeOffset.UtcNow >= session.Expires)
+            {
+                EndPairing(cancel: false);
+                ShowPairResult(paired is not null ? Loc.T("Remote.Paired", paired.Name) : Loc.T("Settings.RemotePairExpired"));
+            }
+        }
+
+        DeviceList.Children.Clear();
+        foreach (var device in remote.Devices)
+        {
+            string seen = device.LastSeenUtc is { } last ? Format.When(last.ToLocalTime()) : "–";
+            var text = new TextBlock
+            {
+                Text = Loc.T("Settings.RemoteDevice", device.Name, Format.When(device.PairedUtc.ToLocalTime()), seen),
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            };
+            var remove = new Button { Content = Loc.T("Settings.RemoteRemove"), Tag = device.DeviceId, Margin = new(8, 0, 0, 0) };
+            remove.Click += (sender, _) => _host.App.RemoveRemoteDevice((string)((Button)sender!).Tag!);
+            Grid.SetColumn(remove, 1);
+            var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+            row.Children.Add(text);
+            row.Children.Add(remove);
+            DeviceList.Children.Add(row);
+        }
+        DeviceHint.IsVisible = remote.Devices.Count > 0;
+        RemoveAllButton.IsVisible = remote.Devices.Count > 1;
+    }
+
+    private bool ServerValid(out string server)
+    {
+        server = (RemoteServerBox.Text ?? "").Trim();
+        if (server.Length == 0) server = RemoteSettings.DefaultServer;
+        return RemoteSettings.ParseServer(server) is not null;
+    }
+
+    private void StoreRemote(string server)
+    {
+        var remote = _downloads.Settings.Remote;
+        remote.Enabled = RemoteBox.IsChecked == true;
+        remote.AutoStart = RemoteAutoBox.IsChecked == true;
+        remote.ServerUrl = server;
+    }
+
+    // Koppeln braucht den laufenden Empfang: Die Angaben zum Handy gelten deshalb sofort, nicht erst mit „Übernehmen“.
+    private void Pair_Click(object? sender, RoutedEventArgs e)
+    {
+        ErrorText.IsVisible = false;
+        PairResult.IsVisible = false;
+        if (!ServerValid(out string server))
+        {
+            ShowError(Loc.T("Settings.RemoteServerInvalid"));
+            return;
+        }
+        RemoteBox.IsChecked = true;
+        StoreRemote(server);
+        _downloads.SaveSettings();
+        _host.App.ApplyRemote();
+        if (_host.App.StartPairing() is not { } pairing)
+        {
+            ShowPairResult(Loc.T("Settings.RemoteTooMany", RemoteSettings.MaxDevices));
+            return;
+        }
+        _pairing = pairing.Session;
+        PairQr.Source = QrImage.Create(pairing.Session.Uri(Environment.MachineName, pairing.Server));
+        PairCode.Text = pairing.Session.Code;
+        PairPanel.IsVisible = true;
+        PairButton.IsVisible = false;
+        _countdown ??= new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => Countdown());
+        _countdown.Start();
+        Countdown();
+        UpdateRemote();
+        // Der Code steht weit unten im Sheet: ins Bild holen.
+        Dispatcher.UIThread.Post(PairCancelButton.BringIntoView, DispatcherPriority.Background);
+    }
+
+    private void Countdown()
+    {
+        if (_pairing is not { } session) return;
+        var left = session.Expires - DateTimeOffset.UtcNow;
+        if (left <= TimeSpan.Zero || !session.IsOpen(DateTimeOffset.UtcNow))
+        {
+            UpdateRemote();
+            return;
+        }
+        PairCountdown.Text = Loc.T("Settings.RemotePairLeft", Format.Duration(left.TotalSeconds));
+    }
+
+    private void EndPairing(bool cancel)
+    {
+        _countdown?.Stop();
+        if (_pairing is null) return;
+        _pairing = null;
+        if (cancel) _host.App.CancelPairing();
+        PairQr.Source = null;
+        PairCode.Text = "";
+        PairPanel.IsVisible = false;
+        PairButton.IsVisible = true;
+    }
+
+    private void ShowPairResult(string text)
+    {
+        PairResult.Text = text;
+        PairResult.IsVisible = true;
+    }
+
+    private void PairCancel_Click(object? sender, RoutedEventArgs e) => EndPairing(cancel: true);
+
+    private void RemoveAll_Click(object? sender, RoutedEventArgs e)
+    {
+        foreach (var device in _downloads.Settings.Remote.Devices.ToList()) _host.App.RemoveRemoteDevice(device.DeviceId);
     }
 
     /// <summary>Programmname mit Version, darunter der Herkunftshinweis aus der eingebetteten NOTICE.md.</summary>
@@ -145,6 +295,12 @@ public partial class SettingsSheet : UserControl
         if (sevenZip.Length > 0 && !IsFullPath(sevenZip))
         {
             ShowError(Loc.T("Settings.SevenZipInvalid"));
+            return false;
+        }
+
+        if (!ServerValid(out string remoteServer))
+        {
+            ShowError(Loc.T("Settings.RemoteServerInvalid"));
             return false;
         }
 
@@ -214,6 +370,8 @@ public partial class SettingsSheet : UserControl
 
         _host.App.ApplyAppearance();
         _host.App.UpdateClipboardWatch();
+        StoreRemote(remoteServer);
+        _host.App.ApplyRemote();
 
         // Erst schließen, wenn gespeichert ist: Ein Schreibfehler steht im Sheet.
         SaveButton.IsEnabled = false;

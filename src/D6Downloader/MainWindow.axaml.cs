@@ -16,6 +16,7 @@ using Avalonia.VisualTree;
 using D6Downloader.Downloads;
 using D6Downloader.Hosters.Rapidgator;
 using D6Downloader.Packages;
+using D6Downloader.Remote;
 using D6Downloader.Sheets;
 
 namespace D6Downloader;
@@ -297,6 +298,95 @@ public partial class MainWindow : Window
         }
         else
             OpenAdd(text, passwords);
+    }
+
+    // ---------------------------------------------------------------- Links vom Handy
+
+    private readonly Queue<(string Text, Action<RemoteOutcome> Done)> _remoteQueue = new();
+    private bool _remoteBusy;
+
+    /// <summary>Prüfung der Ziele für „sofort starten“.</summary>
+    internal TargetGuard RemoteTargets { get; set; } = new();
+
+    /// <summary>So lange wartet „sofort starten“ höchstens auf Probe und Online-Check.</summary>
+    internal TimeSpan RemoteTimeout { get; set; } = TimeSpan.FromSeconds(60);
+
+    /// <summary>
+    /// Links vom Handy. Ohne <paramref name="auto"/> der gewöhnliche Weg in den Dialog. Mit <paramref name="auto"/> sofort
+    /// starten, aber nie, während der Benutzer in einem Sheet arbeitet. <paramref name="done"/> wird genau einmal gerufen.
+    /// </summary>
+    public void ReceiveRemoteLinks(string text, bool auto, Action<RemoteOutcome> done)
+    {
+        int count = LinkParser.Extract(text).Count;
+        if (count == 0)
+        {
+            done(new RemoteOutcome(ReceiptState.Rejected, 0, Err: ReceiptError.NoLink));
+            return;
+        }
+        if (!auto || (!_remoteBusy && IsSheetOpen))
+        {
+            ReceiveLinks(text);
+            done(new RemoteOutcome(ReceiptState.PendingConfirmation, count));
+            return;
+        }
+        _remoteQueue.Enqueue((text, done));
+        if (!_remoteBusy) RunRemoteQueue();
+    }
+
+    private async void RunRemoteQueue()
+    {
+        _remoteBusy = true;
+        try
+        {
+            while (_remoteQueue.TryDequeue(out var job))
+            {
+                var outcome = await StartRemoteAsync(job.Text);
+                job.Done(outcome);
+            }
+        }
+        finally
+        {
+            _remoteBusy = false;
+        }
+    }
+
+    private async Task<RemoteOutcome> StartRemoteAsync(string text)
+    {
+        var allowed = new List<string>();
+        var unresolved = new HashSet<string>(StringComparer.Ordinal);
+        int blocked = 0;
+        try
+        {
+            // Vor der Probe prüfen: Schon sie wäre eine Anfrage an das Ziel.
+            foreach (string url in LinkParser.Extract(text))
+            {
+                var verdict = await RemoteTargets.CheckAsync(url);
+                if (verdict == TargetVerdict.Blocked)
+                {
+                    blocked++;
+                    continue;
+                }
+                allowed.Add(url);
+                if (verdict == TargetVerdict.Unresolved) unresolved.Add(url);
+            }
+            if (allowed.Count == 0) return new RemoteOutcome(ReceiptState.Rejected, 0, blocked, ReceiptError.BlockedTarget);
+            string links = string.Join(Environment.NewLine, allowed);
+            if (_app.Quitting || IsSheetOpen)
+            {
+                if (!_app.Quitting) ReceiveLinks(links);
+                return new RemoteOutcome(ReceiptState.PendingConfirmation, allowed.Count, blocked);
+            }
+            var finished = new TaskCompletionSource<RemoteOutcome>();
+            AddSheet.OpenAuto(this, links, RemoteTargets, unresolved, RemoteTimeout, o => finished.TrySetResult(o));
+            var outcome = await finished.Task;
+            return outcome with { Skipped = outcome.Skipped + blocked };
+        }
+        catch (Exception)
+        {
+            // Im Zweifel nichts starten.
+            ReceiveLinks(text);
+            return new RemoteOutcome(ReceiptState.PendingConfirmation, allowed.Count);
+        }
     }
 
     /// <summary>Öffnet den Hinzufügen-Dialog. Ist er schon offen, kommen die Links dazu.</summary>

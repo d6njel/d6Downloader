@@ -210,6 +210,7 @@ Die Erweiterung entfernt man im Browser selbst.
 | Startbefehl (Verknüpfung) | `~/.local/bin/d6downloader` |
 | Startmenü-Eintrag und Symbol | `~/.local/share/applications/d6downloader.desktop`, `~/.local/share/icons/hicolor/<Größe>/apps/d6downloader.png` (16, 24, 32, 48, 64, 128 und 256 Pixel) |
 | Autostart | `~/.config/autostart/d6downloader.desktop` |
+| Gesehene Handy-Nachrichten (nur Kennungen und Zeiten) | `~/.config/d6downloader/remote-state.json` |
 | Browser-Verbindung | `d6downloader.host.json` in `~/.config/<Browser>/NativeMessagingHosts/` bzw. `~/.mozilla/native-messaging-hosts/` |
 | Zwischenspeicher des Programms | `~/.net/d6downloader/` |
 | Sperre und Socket, solange es läuft | `$XDG_RUNTIME_DIR/d6downloader/` (meist `/run/user/<Nummer>/d6downloader/`) |
@@ -241,6 +242,7 @@ Zum Sichern den Ordner `~/.config/d6downloader` bei beendetem Programm kopieren.
   erlauben.
 - **Browser-Erweiterung:** Sie darf nur ein Rechtsklick-Menü anzeigen und mit d6Downloader sprechen. Sie liest keine
   Seiteninhalte.
+- **Links vom Handy** sind ab Werk aus. Was dabei sichtbar ist und was nicht, steht in Abschnitt 11.
 - Über `--add` und die Verbindung zwischen den Programmteilen kann jedes Programm unter deinem Benutzerkonto Links in den
   Hinzufügen-Dialog legen.
 
@@ -252,6 +254,7 @@ Ende, `--add`, zweiter Start, Beenden.
 
 **Ungeprüft:**
 
+- Links vom Handy mit dem echten ntfy-Server, einem echten Handy, Mobilfunk und VPN (nur gegen Attrappen, Abschnitt 11)
 - Bedienung auf deinem echten Desktop (Maus, Tastatur, Hell/Dunkel, Skalierung), Eintrag und Symbol im Startmenü
 - Tray-Symbol, Benachrichtigungen, Zwischenablage-Überwachung, Drag & Drop aus dem Browser, Dateidialoge,
   „Im Ordner zeigen“, Click'n'Load
@@ -285,3 +288,63 @@ Kompression, beide Namensschemata), fehlende Teile, Beschädigung, Verknüpfunge
 - **Browser meldet „nicht verbunden“:** In d6Downloader unter „Browser verbinden …“ den Stand prüfen. Steht dort
   „Aktualisieren nötig“, auf „Aktualisieren“ klicken.
 - **Entpacken geht nicht:** `sudo dnf install 7zip bsdtar unar glib2`, Meldungen siehe Abschnitt 5.
+
+## 11. Links vom Handy
+
+Mit der Android-App **d6 Remote** schickt man vom Handy aus Links an den PC, auch unterwegs über Mobilfunk. Handy und PC
+bauen dafür nur ausgehende Verbindungen zu einem **ntfy-Server** auf (Standard `https://ntfy.sh`, ohne Konto). Am Router
+oder an der Firewall muss nichts geöffnet werden.
+
+### Einrichten
+
+1. d6Downloader muss laufen. Empfohlen: in den Einstellungen Autostart einschalten und „Fenster schließen“ auf Tray.
+2. Einstellungen, Abschnitt **Dienste**, Zeile **Handy**: **„Handy koppeln …“**. Ein QR-Code und ein Code aus 26 Zeichen
+   erscheinen, gültig 10 Minuten. Das Einstellungsfenster dabei offen lassen.
+3. In der App auf dem Handy **QR-Code scannen** (oder den Code eintippen) und kurz warten, bis „An <PC-Name>“ erscheint.
+4. Danach in anderen Apps **Teilen → An PC senden**, oder in der App den Link einfügen und **An PC senden**.
+
+Den QR-Code niemandem zeigen und nicht fotografieren: Wer ihn hat, kann dem PC Links schicken, bis du das Handy entfernst.
+
+### Was mit den Links passiert
+
+- Ab Werk öffnet sich der **Hinzufügen-Dialog** mit den Links. Nichts startet ohne dich.
+- Mit **„Links vom Handy sofort starten“** prüft der Dialog die Links ohne dein Zutun und startet die unbedenklichen. Im
+  Dialog bleiben: nicht erreichbare, offline oder geschützte Links, Rapidgator ohne gültige Anmeldung, ungültige
+  Zielordner und ganze Pakete, bei denen ein Teil betroffen ist. Doppelte, schon vorhandene und durch Regeln abgewählte
+  werden übersprungen. Adressen im eigenen Rechner oder Heimnetz werden abgelehnt. Der Zielordner ist der Ordner der
+  Kategorie, sonst der Standard-Download-Ordner.
+- Bist du gerade selbst in einem Fenster des Programms (Dialog oder Einstellungen), startet nichts von selbst.
+- Das Handy bekommt eine Rückmeldung: „angekommen“, „eingereiht“, „teilweise“ oder „Fehler“.
+- Ist der PC aus oder im Standby, warten die Links beim ntfy-Server höchstens etwa 12 Stunden. Danach sind sie weg.
+
+### Entfernen
+
+In derselben Zeile steht jedes gekoppelte Handy mit **Entfernen**; bei mehreren auch **Alle entfernen**. Danach wird sein
+Kanal nicht mehr gelesen. Handy verloren oder Code fotografiert: sofort entfernen.
+
+### Sicherheit und Grenzen
+
+- Inhalte (Links, Gerätenamen) sind mit AES-256-GCM verschlüsselt; der Schlüssel entsteht beim Koppeln und geht nur über
+  den QR-Code bzw. Code. Der ntfy-Server kann Nachrichten nicht lesen oder fälschen.
+- Er **sieht** aber: die IP-Adressen von Handy und PC (bei VPN die des VPN-Anbieters), die zufälligen Kanalnamen,
+  Zeitpunkte, Größen und dass dieses Handy mit diesem PC spricht. Er kann Nachrichten verwerfen oder verzögern.
+- Schutz vor Adressen im Heimnetz hat eine Lücke: Geprüft wird vor dem Download. Eine Domain, die ihre Adresse danach
+  ändert (DNS-Rebinding), oder eine Weiterleitung erst beim Download wird nicht noch einmal geprüft. Schon die Prüfung
+  im Dialog folgt Weiterleitungen und kann dabei eine Anfrage ins Heimnetz stellen.
+- Die Uhren von Handy und PC müssen stimmen (automatische Uhrzeit an). Mehr als 10 Minuten vor oder 13 Stunden nach:
+  Die Nachricht wird ohne Rückmeldung verworfen.
+- Höchstens 10 Handys, 50 Links je Nachricht, 30 Sendungen in 10 Minuten.
+- Grenzen von ntfy.sh ohne Konto (**Annahmen, nicht nachgeprüft**): etwa 4096 Byte je Nachricht, 12 Stunden
+  Zwischenspeicher, rund 250 Nachrichten je Tag und IP-Adresse, begrenzte Anfragen je Sekunde. Mit einem VPN teilst du
+  dir die IP-Adresse und damit diese Grenzen mit Fremden.
+
+### Fehlerbilder
+
+| Anzeige | Bedeutung und Abhilfe |
+|---|---|
+| Handy: „wartet auf PC“ | PC aus, im Standby oder d6Downloader läuft nicht. Starten; innerhalb von 12 Stunden kommt der Link noch an. |
+| Handy: „abgelaufen“ | 12 Stunden ohne Rückmeldung. Am PC nachsehen, sonst neu senden. |
+| Handy: „ntfy-Limit“ / PC: „ntfy begrenzt die Anfragen“ | Warten. Mit VPN hilft oft, d6Downloader am VPN vorbeizuleiten oder ein eigener ntfy-Server. |
+| PC: „verbinde neu (…)“ | Keine Verbindung zum Server (Netz, VPN-Wechsel). Das Programm versucht es selbst weiter. |
+| „Der Kanal des Handys wird gestört“ | Jemand kennt den Kanalnamen. Handy entfernen und neu koppeln. |
+| Koppeln: „Keine Antwort vom PC“ | Code abgelaufen, Einstellungen am PC geschlossen oder Tippfehler. Neu koppeln. |

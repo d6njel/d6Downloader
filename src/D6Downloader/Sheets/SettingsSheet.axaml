@@ -92,7 +92,7 @@
                 </Grid>
 
                 <TextBlock Classes="section" Text="{l:Str Settings.Section.Services}"/>
-                <Grid ColumnDefinitions="170,*" RowDefinitions="Auto,Auto">
+                <Grid ColumnDefinitions="170,*" RowDefinitions="Auto,Auto,Auto">
                     <TextBlock Classes="rowLabel" Text="{l:Str Settings.ClickNLoad}" VerticalAlignment="Top"/>
                     <StackPanel Grid.Column="1" Margin="0,0,0,6">
                         <CheckBox x:Name="ClickNLoadBox" Content="{l:Str Settings.ClickNLoadBox}" ToolTip.Tip="{l:Str Settings.ClickNLoadTip}"/>
@@ -101,6 +101,36 @@
                     <TextBlock Grid.Row="1" Classes="rowLabel" Text="{l:Str Settings.Clipboard}" VerticalAlignment="Top"/>
                     <CheckBox x:Name="ClipboardBox" Grid.Row="1" Grid.Column="1" Content="{l:Str Settings.ClipboardBox}"
                               ToolTip.Tip="{l:Str Settings.ClipboardTip}" Margin="0,0,0,6"/>
+
+                    <!-- Links vom Handy über ntfy, Ende-zu-Ende verschlüsselt; ab Werk aus -->
+                    <TextBlock Grid.Row="2" Classes="rowLabel" Text="{l:Str Settings.Remote}" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,6" Spacing="4">
+                        <CheckBox x:Name="RemoteBox" Content="{l:Str Settings.RemoteBox}" ToolTip.Tip="{l:Str Settings.RemoteTip}"/>
+                        <TextBlock x:Name="RemoteStatusText" Classes="secondary" TextWrapping="Wrap"/>
+                        <CheckBox x:Name="RemoteAutoBox" Content="{l:Str Settings.RemoteAuto}" ToolTip.Tip="{l:Str Settings.RemoteAutoTip}"/>
+                        <Expander Header="{l:Str Settings.RemoteAdvanced}" HorizontalAlignment="Stretch">
+                            <StackPanel Spacing="4">
+                                <TextBlock Classes="label" Text="{l:Str Settings.RemoteServer}"/>
+                                <TextBox x:Name="RemoteServerBox" PlaceholderText="https://ntfy.sh"/>
+                                <TextBlock Classes="secondary" Text="{l:Str Settings.RemoteServerNote}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Expander>
+                        <Button x:Name="PairButton" Content="{l:Str Settings.RemotePair}" Click="Pair_Click"/>
+                        <StackPanel x:Name="PairPanel" Spacing="6" IsVisible="False">
+                            <TextBlock x:Name="PairHint" Classes="secondary" Text="{l:Str Settings.RemotePairHint}" TextWrapping="Wrap"/>
+                            <!-- weißer Rand: Scanner brauchen ihn, auch im dunklen Design -->
+                            <Border Background="White" Padding="8" HorizontalAlignment="Left">
+                                <Image x:Name="PairQr" Width="220" Height="220"/>
+                            </Border>
+                            <SelectableTextBlock x:Name="PairCode" FontSize="15" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="PairCountdown" Classes="secondary" TextWrapping="Wrap"/>
+                            <Button x:Name="PairCancelButton" Content="{l:Str Common.Cancel}" Click="PairCancel_Click"/>
+                        </StackPanel>
+                        <TextBlock x:Name="PairResult" Classes="secondary" TextWrapping="Wrap" IsVisible="False"/>
+                        <StackPanel x:Name="DeviceList" Spacing="4"/>
+                        <TextBlock x:Name="DeviceHint" Classes="secondary" Text="{l:Str Settings.RemoteDeviceHint}" TextWrapping="Wrap"/>
+                        <Button x:Name="RemoveAllButton" Content="{l:Str Settings.RemoteRemoveAll}" Click="RemoveAll_Click"/>
+                    </StackPanel>
                 </Grid>
 
                 <TextBlock Classes="section" Text="{l:Str Settings.Section.Notifications}"/>

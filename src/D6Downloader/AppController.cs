@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -10,9 +11,11 @@ using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using D6Downloader.Browser;
+using D6Downloader.Debrid;
 using D6Downloader.Downloads;
 using D6Downloader.Hosters.Rapidgator;
 using D6Downloader.Power;
+using D6Downloader.Remote;
 using D6Downloader.Services;
 
 namespace D6Downloader;
@@ -64,7 +67,12 @@ public sealed class AppController : IDisposable
         if (!autostarted) Show();
 
         // Liste und Tray erst nach dem ersten Fenster.
-        Dispatcher.UIThread.Post(async () => await Downloads.LoadAsync(), DispatcherPriority.Loaded);
+        Dispatcher.UIThread.Post(async () =>
+        {
+            await Downloads.LoadAsync();
+            // Erst mit geladener Liste: sonst kennt die Duplikat-Prüfung die vorhandenen Downloads nicht.
+            if (!_disposed && !Quitting) ApplyRemote();
+        }, DispatcherPriority.Loaded);
         Dispatcher.UIThread.Post(async () => await StartBackgroundAsync(autostarted), DispatcherPriority.Background);
     }
 
@@ -246,6 +254,186 @@ public sealed class AppController : IDisposable
         ClickNLoadError = null;
     }
 
+    // ---------------------------------------------------------------- Links vom Handy
+
+    private RelayReceiver? _remote;
+    private ReplayStore? _replay;
+    private Uri? _remoteServer;
+
+    /// <summary>Wie der Empfänger den Vermittler erreicht; Tests setzen eine Attrappe ein.</summary>
+    internal Func<Uri, IRelay> RelayFactory { get; set; } = server => new NtfyRelay(server, "d6downloader/" + NativeHost.AppVersion());
+
+    /// <summary>Status, Geräteliste oder Pairing haben sich geändert. Kommt auf dem UI-Thread.</summary>
+    public event Action? RemoteChanged;
+
+    internal RelayReceiver? Remote => _remote;
+
+    public string RemoteStatusText
+    {
+        get
+        {
+            var settings = Downloads.Settings.Remote;
+            if (settings.Enabled && RemoteSettings.ParseServer(settings.ServerUrl) is null) return Loc.T("Remote.Status.BadServer");
+            return _remote?.Status switch
+            {
+                RelayStatus.Idle => Loc.T("Remote.Status.Idle"),
+                RelayStatus.Connecting or RelayStatus.Off => Loc.T("Remote.Status.Connecting"),
+                RelayStatus.Connected => Loc.T("Remote.Status.Connected"),
+                RelayStatus.Reconnecting => Loc.T("Remote.Status.Reconnecting", _remote.StatusReason),
+                RelayStatus.RateLimited => Loc.T("Remote.Status.RateLimited"),
+                _ => Loc.T("Remote.Status.Off"),
+            };
+        }
+    }
+
+    /// <summary>Startet, ändert oder beendet den Empfang nach den Einstellungen. Ausgeschaltet gibt es keine Verbindung.</summary>
+    public void ApplyRemote()
+    {
+        var settings = Downloads.Settings.Remote;
+        var server = RemoteSettings.ParseServer(settings.ServerUrl);
+        if (_disposed || !settings.Enabled || server is null)
+        {
+            StopRemote();
+            RemoteChanged?.Invoke();
+            return;
+        }
+        if (_remote is not null && _remoteServer == server)
+        {
+            _remote.SetDevices(ReceiverDevices());
+            _replay!.Flush(); // der Datenordner kann gewechselt haben
+            return;
+        }
+        StopRemote();
+        _replay = new ReplayStore(() => Path.Combine(AppPaths.DataDir, "remote-state.json"));
+        var receiver = new RelayReceiver(RelayFactory(server), _replay, new RelayReceiverOptions
+        {
+            Version = NativeHost.AppVersion(),
+            Mode = () => Downloads.Settings.Remote.AutoStart ? ReceiveMode.Auto : ReceiveMode.Dialog,
+        });
+        Wire(receiver);
+        _remote = receiver;
+        _remoteServer = server;
+        receiver.SetDevices(ReceiverDevices());
+        receiver.Start();
+        RemoteChanged?.Invoke();
+    }
+
+    public void StopRemote()
+    {
+        var remote = _remote;
+        _remote = null;
+        _remoteServer = null;
+        remote?.Dispose();
+    }
+
+    private ReceiverDevice[] ReceiverDevices() => Downloads.Settings.Remote.Devices
+        .Select(d =>
+        {
+            // Ohne Hauptschlüssel (anderer Rechner) bleibt das Gerät stumm: neu koppeln.
+            if (SecretProtector.Unprotect(d.SeedProtected) is not { } text) return null;
+            var seed = new byte[RemoteCrypto.SeedSize];
+            if (!Convert.TryFromBase64String(text, seed, out int length) || length != seed.Length) return null;
+            return new ReceiverDevice(d.Name, seed, new DateTimeOffset(DateTime.SpecifyKind(d.PairedUtc, DateTimeKind.Utc)));
+        })
+        .OfType<ReceiverDevice>()
+        .ToArray();
+
+    private void Wire(RelayReceiver receiver)
+    {
+        // Alles kommt vom Hintergrund-Thread; nach StopRemote zählt nichts mehr davon.
+        void OnUi(Action action) => Dispatcher.UIThread.Post(() =>
+        {
+            if (!_disposed && !Quitting && ReferenceEquals(_remote, receiver)) action();
+        });
+
+        receiver.StatusChanged += () => OnUi(() => RemoteChanged?.Invoke());
+        receiver.LinksReceived += (links, reply) => OnUi(() =>
+        {
+            bool auto = Downloads.Settings.Remote.AutoStart;
+            bool active = WindowActive;
+            Window.ReceiveRemoteLinks(string.Join(Environment.NewLine, links.Links), auto, outcome =>
+            {
+                NotifyRemote(outcome, active);
+                reply(outcome);
+            });
+        });
+        receiver.Paired += device =>
+        {
+            string seed;
+            try
+            {
+                seed = SecretProtector.Protect(Convert.ToBase64String(device.Seed));
+            }
+            catch (Exception)
+            {
+                _ = receiver.RemoveDeviceAsync(device.DeviceId); // nie unverschlüsselt speichern
+                return;
+            }
+            OnUi(() =>
+            {
+                var devices = Downloads.Settings.Remote.Devices;
+                devices.RemoveAll(d => d.DeviceId == device.DeviceId);
+                devices.Add(new RemoteDevice
+                {
+                    DeviceId = device.DeviceId,
+                    Name = device.Name,
+                    SeedProtected = seed,
+                    PairedUtc = device.Paired.UtcDateTime,
+                    LastSeenUtc = device.Paired.UtcDateTime,
+                });
+                Downloads.SaveSettings();
+                Services.Notifier.Notify(Loc.T("Remote.Title"), Loc.T("Remote.Paired", device.Name));
+                RemoteChanged?.Invoke();
+            });
+        };
+        receiver.Unpaired += id => OnUi(() =>
+        {
+            if (Downloads.Settings.Remote.Devices.RemoveAll(d => d.DeviceId == id) == 0) return;
+            _replay?.Forget(id);
+            Downloads.SaveSettings();
+            RemoteChanged?.Invoke();
+        });
+        receiver.Seen += id => OnUi(() =>
+        {
+            var device = Downloads.Settings.Remote.Devices.Find(d => d.DeviceId == id);
+            if (device is null || DateTime.UtcNow - (device.LastSeenUtc ?? default) < TimeSpan.FromMinutes(1)) return;
+            device.LastSeenUtc = DateTime.UtcNow;
+            Downloads.SaveSettings();
+            RemoteChanged?.Invoke();
+        });
+        receiver.Flooded += name => OnUi(() =>
+            Services.Notifier.Notify(Loc.T("Remote.Title"), Loc.T("Remote.Flood", name), error: true));
+    }
+
+    private void NotifyRemote(RemoteOutcome outcome, bool windowWasActive)
+    {
+        void Notify(string body) => Services.Notifier.Notify(Loc.T("Remote.Title"), body,
+            onClick: () => Dispatcher.UIThread.Post(Show));
+
+        if (outcome.State is ReceiptState.Queued or ReceiptState.Partial)
+            Notify(Loc.Plural("Remote.Started", outcome.N));
+        if (outcome.State == ReceiptState.PendingConfirmation && !windowWasActive)
+            Notify(Loc.Plural("Remote.Waiting", outcome.N));
+        else if (outcome.State == ReceiptState.Partial) Notify(Loc.T("Remote.Partial"));
+    }
+
+    /// <summary>Öffnet ein Pairing-Fenster. Null, wenn der Empfang aus ist oder schon zu viele Handys gekoppelt sind.</summary>
+    internal (PairingSession Session, Uri Server)? StartPairing() =>
+        _remote is null || Downloads.Settings.Remote.Devices.Count >= RemoteSettings.MaxDevices
+            ? null
+            : (_remote.StartPairing(), _remoteServer!);
+
+    internal void CancelPairing() => _remote?.CancelPairing();
+
+    /// <summary>Widerruf: Seed löschen, Topic nicht mehr abonnieren, dem Handy Bescheid geben (ohne Gewähr).</summary>
+    public void RemoveRemoteDevice(string deviceId)
+    {
+        if (Downloads.Settings.Remote.Devices.RemoveAll(d => d.DeviceId == deviceId) == 0) return;
+        Downloads.SaveSettings();
+        _ = _remote?.RemoveDeviceAsync(deviceId);
+        RemoteChanged?.Invoke();
+    }
+
     // ---------------------------------------------------------------- Aussehen
 
     private void ApplyTheme() => _application.RequestedThemeVariant = Downloads.Settings.Theme switch
@@ -282,6 +470,7 @@ public sealed class AppController : IDisposable
         _clipboardTimer?.Stop();
         Downloads.RapidgatorChanged -= OnRapidgatorChanged;
         StopClickNLoad();
+        StopRemote();
         Downloads.Shutdown();
         _tray?.Dispose();
         Services.Notifier.Dispose();

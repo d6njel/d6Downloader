@@ -8,6 +8,7 @@ using D6Downloader.Debrid;
 using D6Downloader.Engine;
 using D6Downloader.Hosters.Rapidgator;
 using D6Downloader.Packages;
+using D6Downloader.Remote;
 
 namespace D6Downloader;
 
@@ -114,6 +115,15 @@ public sealed class AppSettings
     /// Click'n'Load-Server auf 127.0.0.1:9666 laufen lassen: Webseiten schicken Links an den Hinzufügen-Dialog. Standard aus.
     /// </summary>
     public bool ClickNLoad { get; set; }
+
+    /// <summary>Links vom Handy empfangen (über ntfy). Ab Werk aus.</summary>
+    public RemoteSettings Remote
+    {
+        get => _remote;
+        set => _remote = value ?? new();
+    }
+
+    private RemoteSettings _remote = new();
 
     /// <summary>
     /// Die Zwischenablage auf Links prüfen (ereignisgesteuert, über den Windows-Mechanismus für Änderungen) und einen Hinweis

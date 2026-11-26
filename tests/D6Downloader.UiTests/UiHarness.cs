@@ -104,8 +104,12 @@ internal sealed class Ui : IDisposable
     public readonly FakePower Power = new();
     public readonly DownloadManager Downloads;
     public readonly AppController App;
+    public readonly FakeRelay Relay = new();
 
-    public Ui(Action<AppSettings>? configure = null)
+    /// <summary>Wie oft ein Vermittler angelegt wurde.</summary>
+    public int Relays;
+
+    public Ui(Action<AppSettings>? configure = null, bool show = true)
     {
         Downloads = new DownloadManager(new AvaloniaTimerFactory(), new AvaloniaUiDispatcher(), Power,
             rapidgator: new RapidgatorOptions
@@ -121,7 +125,13 @@ internal sealed class Ui : IDisposable
         var services = new AppServices(Shell, Autostart, new BrowserSetup(new FakeLocations(Dir.Path), "/opt/d6downloader"),
             Notifier, Dir.Path);
         App = new AppController(Avalonia.Application.Current!, Downloads, services);
-        Window.Show();
+        // Nie ein echter Vermittler: jeder Test bekommt die Attrappe.
+        App.RelayFactory = _ =>
+        {
+            Relays++;
+            return Relay;
+        };
+        if (show) Window.Show();
         Pump();
     }
 

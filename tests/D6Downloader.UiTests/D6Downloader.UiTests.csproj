@@ -31,6 +31,7 @@
     <Compile Include="..\D6Downloader.Tests\TestSetup.cs" Link="Shared\TestSetup.cs" />
     <Compile Include="..\D6Downloader.Tests\TestServer.cs" Link="Shared\TestServer.cs" />
     <Compile Include="..\D6Downloader.Tests\FakeRapidgator.cs" Link="Shared\FakeRapidgator.cs" />
+    <Compile Include="..\D6Downloader.Tests\FakeRelay.cs" Link="Shared\FakeRelay.cs" />
   </ItemGroup>
 
 </Project>

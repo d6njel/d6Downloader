@@ -28,7 +28,7 @@ cp -R -- "$root/assets/icons" "$out/icons"
 install -m 755 "$root/tools/install.sh" "$out/install.sh"
 install -m 755 "$root/tools/uninstall.sh" "$out/uninstall.sh"
 
-for needed in d6downloader Extension/manifest.json Extension/firefox/manifest.json Licenses/LICENSE-FluentSystemIcons.txt \
+for needed in d6downloader Extension/manifest.json Extension/firefox/manifest.json Licenses/LICENSE-FluentSystemIcons.txt Licenses/LICENSE-QRCoder.txt \
     icons/hicolor/{16x16,24x24,32x32,48x48,64x64,128x128,256x256}/apps/d6downloader.png; do
     [ -f "$out/$needed" ] || { echo "publish.sh: $needed fehlt im Ergebnis." >&2; exit 1; }
 done

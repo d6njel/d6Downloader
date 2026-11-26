@@ -1,5 +1,13 @@
 # Changelog
 
+## d6Downloader 0.3.0 (in Arbeit, noch nicht veröffentlicht)
+
+### Neu
+
+- Links vom Handy annehmen (App „d6 Remote“ für Android): über einen ntfy-Server (Standard `https://ntfy.sh`), Ende-zu-Ende verschlüsselt, ab Werk aus. Koppeln per QR-Code unter Einstellungen → Handy, Geräte lassen sich dort entfernen.
+- Links vom Handy landen im Hinzufügen-Dialog. Auf Wunsch („Links vom Handy sofort starten“, ab Werk aus) starten unbedenkliche Links direkt; Unsicheres bleibt im Dialog, Ziele im eigenen Netz werden abgelehnt.
+- Noch ungeprüft: alles mit dem echten ntfy-Server und einem echten Handy (nur automatische Tests gegen Attrappen).
+
 ## d6Downloader 0.2.0 (in Arbeit, noch nicht veröffentlicht)
 
 ### Geändert

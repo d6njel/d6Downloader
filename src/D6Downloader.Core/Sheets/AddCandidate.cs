@@ -79,6 +79,9 @@ public sealed class AddCandidate : Observable
 
     public bool IsDuplicate => _duplicate;
 
+    /// <summary>Am Zielort liegt schon eine Datei dieses Namens.</summary>
+    internal bool FileExists => _exists;
+
     public CheckStatus Check => _check;
 
     /// <summary>Was der Filter und die Abwähl-Regeln von diesem Link sehen: Name, Link, Größe, Host und Online-Status.</summary>

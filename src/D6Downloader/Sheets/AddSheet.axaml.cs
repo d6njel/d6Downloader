@@ -14,7 +14,9 @@ using Avalonia.Threading;
 using D6Downloader.Debrid;
 using D6Downloader.Downloads;
 using D6Downloader.Engine;
+using D6Downloader.Hosters.Rapidgator;
 using D6Downloader.Packages;
+using D6Downloader.Remote;
 
 namespace D6Downloader.Sheets;
 
@@ -48,6 +50,7 @@ public partial class AddSheet : UserControl
     private long _freeSpace = -1;
     private bool _closed;
     private bool _hostLoadStarted;
+    private bool _hostLoadDone;
     private bool _hostWaitOver; // die Wartezeit auf die Hoster-Liste ist vorbei: neue Zeilen werden sofort geprobt
     private readonly List<AddCandidate> _waitingForHosts = new();
 
@@ -114,9 +117,14 @@ public partial class AddSheet : UserControl
             if (!UseService(c)) Probe(c);
         }
         Refresh();
-        if (load.IsCompleted) return;
+        if (load.IsCompleted)
+        {
+            _hostLoadDone = true;
+            return;
+        }
 
         await load;
+        _hostLoadDone = true;
         if (_closed) return;
         foreach (var c in _known.Values)
             if (!c.ViaDebrid) UseService(c);
@@ -174,6 +182,7 @@ public partial class AddSheet : UserControl
     /// <summary>Weitere Links anhängen (Drag &amp; Drop oder Strg+V bei offenem Dialog).</summary>
     public void Append(string text)
     {
+        LeaveAuto(); // Was jetzt dazukommt, startet nie von selbst.
         string current = LinksBox.Text ?? "";
         if (current.Length > 0 && !current.EndsWith('\n')) current += Environment.NewLine;
         LinksBox.Text = current + text.Trim() + Environment.NewLine;
@@ -543,10 +552,201 @@ public partial class AddSheet : UserControl
         }
     }
 
+    // ---------------------------------------------------------------- Vom Handy: sofort starten
+
+    private Action<RemoteOutcome>? _autoDone;
+    private DispatcherTimer? _autoTimer;
+    private TargetGuard? _guard;
+    private IReadOnlySet<string> _unresolved = new HashSet<string>();
+    private DateTime _autoDeadline;
+    private bool _deciding;
+
+    /// <summary>Läuft gerade die automatische Prüfung? Jede Eingabe des Benutzers beendet sie.</summary>
+    internal bool IsAuto => _autoDone is not null;
+
+    /// <summary>
+    /// Öffnet den Dialog, ohne das Fenster zu zeigen, wartet auf Probe und Online-Check und startet dann die unbedenklichen
+    /// Links. Prüfungen, Kategorien, Pakete, Duplikate und Regeln sind dieselben wie beim Dialog. Was unsicher ist, bleibt im
+    /// Dialog stehen. <paramref name="done"/> wird genau einmal gerufen.
+    /// </summary>
+    /// <param name="unresolved">Links, deren Ziel sich nicht prüfen ließ: nur über den Dialog.</param>
+    internal static AddSheet OpenAuto(MainWindow host, string text, TargetGuard guard, IReadOnlySet<string> unresolved,
+        TimeSpan timeout, Action<RemoteOutcome> done)
+    {
+        var sheet = new AddSheet(host, host.Downloads, null, null)
+        {
+            _autoDone = done,
+            _guard = guard,
+            _unresolved = unresolved,
+            _autoDeadline = DateTime.UtcNow + timeout,
+        };
+        sheet.FolderBox.Text = host.Downloads.Settings.EffectiveDownloadFolder;
+        sheet.LinksBox.Text = text.Trim() + Environment.NewLine;
+        sheet.Parse();
+        sheet.UpdateFolder();
+        sheet.AddHandler(PointerPressedEvent, (_, _) => sheet.LeaveAuto(), RoutingStrategies.Tunnel, handledEventsToo: true);
+        sheet.AddHandler(KeyDownEvent, (_, _) => sheet.LeaveAuto(), RoutingStrategies.Tunnel, handledEventsToo: true);
+        host.ShowSheet(sheet, sheet.LinksBox);
+        sheet._autoTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(150) };
+        sheet._autoTimer.Tick += (_, _) => sheet.AutoTick();
+        sheet._autoTimer.Start();
+        return sheet;
+    }
+
+    /// <summary>Ab jetzt ein gewöhnlicher Dialog: Der Benutzer entscheidet.</summary>
+    private void LeaveAuto()
+    {
+        if (_autoDone is not { } done) return;
+        _autoDone = null;
+        _autoTimer?.Stop();
+        done(new RemoteOutcome(ReceiptState.PendingConfirmation, _parsed.Count));
+    }
+
+    /// <summary>Ein anderes Sheet hat diesen Dialog verdrängt: Die Links vormerken, damit sie nicht verloren gehen.</summary>
+    private void Displaced()
+    {
+        var done = _autoDone!;
+        _autoDone = null;
+        _autoTimer?.Stop();
+        string text = LinksBox.Text ?? "";
+        int count = _parsed.Count;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!_host.App.Quitting) _host.ReceiveLinks(text);
+            done(new RemoteOutcome(ReceiptState.PendingConfirmation, count));
+        });
+    }
+
+    private bool Settled =>
+        !_parseDelay.IsEnabled && !_refreshDelay.IsEnabled && !_checkDelay.IsEnabled && _checkQueue.Count == 0
+        && _waitingForHosts.Count == 0 && (!_hostLoadStarted || _hostLoadDone)
+        && _parsed.All(c => c.State != CandidateState.Probing && c.Check != CheckStatus.Checking);
+
+    private async void AutoTick()
+    {
+        if (_autoDone is null || _deciding) return;
+        if (!ReferenceEquals(_host.CurrentSheet, this))
+        {
+            Stop();
+            return;
+        }
+        bool timedOut = DateTime.UtcNow >= _autoDeadline;
+        if (!timedOut && !Settled) return;
+        _deciding = true;
+        try
+        {
+            await Decide(timedOut);
+        }
+        catch (Exception)
+        {
+            // Im Zweifel nichts starten: Der Dialog bleibt mit den Links stehen.
+            LeaveAuto();
+            _host.Reveal();
+        }
+        finally
+        {
+            _deciding = false;
+        }
+    }
+
+    private async Task Decide(bool timedOut)
+    {
+        Parse(); // Pakete und Regeln auf dem letzten Stand
+        var blocked = new HashSet<AddCandidate>();
+        foreach (var c in _parsed.ToList())
+        {
+            // Nach Weiterleitungen: Auch das Ziel darf nicht im eigenen Netz liegen.
+            if (c.FinalKey is { } final && final != c.Key && await _guard!.CheckAsync(final, _cts.Token) != TargetVerdict.Allowed)
+                blocked.Add(c);
+        }
+        if (_autoDone is null || _closed) return; // inzwischen hat der Benutzer übernommen
+
+        var ready = new List<AddCandidate>();
+        var open = new List<AddCandidate>();
+        int duplicates = 0, filtered = 0;
+        foreach (var c in _parsed)
+        {
+            if (blocked.Contains(c)) continue;
+            if (c.IsDuplicate || c.FileExists) duplicates++;
+            else if (c.RuleDeselected) filtered++;
+            else if (timedOut || !SafeToStart(c)) open.Add(c);
+            else ready.Add(c);
+        }
+        // Ein Paket startet ganz oder gar nicht: Sonst wäre das Archiv auf zwei Pakete verteilt.
+        var held = open.Concat(blocked).Select(c => c.Package).Where(p => p is not null).ToHashSet();
+        foreach (var c in ready.Where(c => c.Package is not null && held.Contains(c.Package)).ToList())
+        {
+            ready.Remove(c);
+            open.Add(c);
+        }
+        var rest = _parsed.Where(open.Contains).ToList(); // in der alten Reihenfolge
+        int skipped = duplicates + filtered + blocked.Count;
+        if (ready.Count > 0) Commit(ready, start: true);
+
+        var done = _autoDone;
+        _autoDone = null;
+        _autoTimer?.Stop();
+        if (rest.Count == 0)
+        {
+            Close();
+            done(ready.Count > 0
+                ? new RemoteOutcome(ReceiptState.Queued, ready.Count, skipped)
+                : new RemoteOutcome(ReceiptState.Rejected, 0, skipped, blocked.Count > 0 ? ReceiptError.BlockedTarget
+                    : filtered > 0 ? ReceiptError.Filtered : ReceiptError.AllDuplicate));
+            return;
+        }
+        LinksBox.Text = string.Join(Environment.NewLine, rest.Select(c => c.Url)) + Environment.NewLine;
+        Parse();
+        _host.Reveal();
+        done(ready.Count > 0
+            ? new RemoteOutcome(ReceiptState.Partial, ready.Count, skipped)
+            : new RemoteOutcome(ReceiptState.PendingConfirmation, rest.Count, skipped));
+    }
+
+    private bool SafeToStart(AddCandidate c)
+    {
+        if (c.State != CandidateState.Ready || _unresolved.Contains(c.Url)) return false;
+        if (c.Check is CheckStatus.Offline or CheckStatus.Protected or CheckStatus.NoAccess or CheckStatus.Checking) return false;
+        if (c.ServiceId is { } service)
+        {
+            if (_downloads.Router.Find(service)?.IsActive != true) return false;
+        }
+        else if (HostsUnknown(c.Url)) return false;
+        // Rapidgator nur über das angemeldete Konto: Ohne wäre es die Webseite statt der Datei.
+        if (RapidgatorLinks.IsRapidgator(c.Url)
+            && (c.ServiceId != RapidgatorProvider.ProviderId || _downloads.Rapidgator.State != RapidgatorState.LoggedIn))
+            return false;
+        return CanWrite(EffectiveFolder(c));
+    }
+
+    /// <summary>Lässt sich im Ordner (oder in seinem nächsten vorhandenen Elternordner) eine Datei anlegen?</summary>
+    private static bool CanWrite(string folder)
+    {
+        if (!IsValidFolder(folder)) return false;
+        string? dir = folder;
+        while (dir is not null && !Directory.Exists(dir))
+        {
+            if (File.Exists(dir)) return false;
+            dir = Path.GetDirectoryName(dir);
+        }
+        if (dir is null) return false;
+        try
+        {
+            using var probe = new FileStream(Path.Combine(dir, ".d6-" + Guid.NewGuid().ToString("N")), FileMode.CreateNew,
+                FileAccess.Write, FileShare.None, 1, FileOptions.DeleteOnClose);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
+
     // ---------------------------------------------------------------- Abschluss
 
     private void Add_Click(object? sender, RoutedEventArgs e)
     {
+        LeaveAuto();
         Parse(); // falls der Text eben erst geändert wurde
         string folder = Folder;
         var chosen = _visible.Where(c => c.IsChecked).ToList();
@@ -561,6 +761,13 @@ public partial class AddSheet : UserControl
             settings.RecentFolders.RemoveRange(RecentFolderCount, settings.RecentFolders.Count - RecentFolderCount);
         _downloads.SaveSettings();
 
+        Commit(chosen, start);
+        Close();
+    }
+
+    /// <summary>Legt die Downloads an: derselbe Weg für den Klick und für „sofort starten“.</summary>
+    private void Commit(IReadOnlyList<AddCandidate> chosen, bool start)
+    {
         string? protectedPasswords = PasswordRules.Encode(_passwords); // einmal verschlüsseln, nur für Pakete und Archive
         _downloads.Add(chosen.Select(c => new DownloadItem(c.Url, c.Name, EffectiveFolder(c))
         {
@@ -572,10 +779,13 @@ public partial class AddSheet : UserControl
             PackageName = c.Package?.EffectiveName,
             ArchivePasswords = c.Package is not null || ExtractPlanner.IsSingleArchive(c.Name) ? protectedPasswords : null,
         }), start);
-        Close();
     }
 
-    private void Cancel_Click(object? sender, RoutedEventArgs e) => Close();
+    private void Cancel_Click(object? sender, RoutedEventArgs e)
+    {
+        LeaveAuto();
+        Close();
+    }
 
     private void Stop()
     {
@@ -586,6 +796,8 @@ public partial class AddSheet : UserControl
         _folderDelay.Stop();
         _refreshDelay.Stop();
         _checkDelay.Stop();
+        _autoTimer?.Stop();
+        if (_autoDone is not null) Displaced();
         foreach (var header in _headers.Values) header.Changed -= Header_Changed;
         foreach (var candidate in _known.Values) candidate.PropertyChanged -= Candidate_PropertyChanged;
     }

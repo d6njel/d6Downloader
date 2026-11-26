@@ -7,9 +7,9 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <RootNamespace>D6Downloader</RootNamespace>
     <AssemblyName>d6downloader</AssemblyName>
-    <Version>0.2.0</Version>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
-    <FileVersion>0.2.0.0</FileVersion>
+    <Version>0.3.0</Version>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+    <FileVersion>0.3.0.0</FileVersion>
     <Product>d6Downloader</Product>
     <Description>d6Downloader</Description>
     <!-- Die Git-Commit-Kennung nicht an die Version haengen (sonst "1.0.0+hash"). -->
@@ -24,6 +24,7 @@
     <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="QRCoder" Version="1.9.0" />
     <!-- Benachrichtigungen über D-Bus. Dieselbe Version wie Avalonia.FreeDesktop. -->
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.94.1" />
   </ItemGroup>
@@ -48,6 +49,7 @@
     <!-- Freie Icon-Schrift (MIT), Lizenzdatei daneben. -->
     <AvaloniaResource Include="Assets\Fonts\*.ttf" />
     <None Include="Assets\Fonts\LICENSE-FluentSystemIcons.txt" Link="Licenses\LICENSE-FluentSystemIcons.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Assets\LICENSE-QRCoder.txt" Link="Licenses\LICENSE-QRCoder.txt" CopyToOutputDirectory="PreserveNewest" />
     <!-- Herkunftshinweis, unten in den Einstellungen angezeigt. -->
     <EmbeddedResource Include="..\..\NOTICE.md" LogicalName="NOTICE.md" />
   </ItemGroup>
