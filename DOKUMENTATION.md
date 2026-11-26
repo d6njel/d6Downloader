@@ -128,6 +128,11 @@ die Option darunter ein.
 
 - Gilt beim automatischen und beim manuellen Entpacken, und nur, wenn das Entpacken vollständig geklappt hat und
   mindestens eine Datei herauskam.
+- Bei einfachen ZIP wird die Prüfsumme jeder Datei verglichen. Hat nur `bsdtar` ein ZIP oder RAR entpacken können, bleiben
+  die Archive liegen (auch wenn das Protokoll als Grund die Datei oder den Papierkorb nennt), weil `bsdtar` Schäden nicht
+  sicher meldet.
+- Grenze: Ein einteiliges RAR 4, das genau zwischen zwei Dateien abgeschnitten ist, fällt nicht auf. Die übrigen Dateien
+  gelten als vollständig, und das Archiv wird entfernt.
 - In den Papierkorb kommen alle Teile des Archivs aus der Download-Liste, andere Dateien (etwa `.nfo`) nie.
 - Eine Datei, die seit Beginn des Entpackens verändert wurde oder eine Verknüpfung ist, bleibt liegen. Ebenso, wenn der
   Papierkorb nicht geht (etwa auf manchen Netzlaufwerken). Ohne das Unterhäkchen darunter wird nie endgültig gelöscht.

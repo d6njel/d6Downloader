@@ -7,6 +7,12 @@
 - Unterhäkchen „Stattdessen endgültig löschen (nicht rückgängig zu machen)“ unter „Archive nach dem Entpacken in den Papierkorb verschieben“ (ab Werk aus, braucht kein `gio`): Die Archivteile werden nur gelöscht, wenn das Entpacken vollständig geklappt hat und alle Teile unverändert sind, sonst bleiben alle liegen. Andere Dateien werden nie gelöscht.
 - Noch ungeprüft: das endgültige Löschen mit echten Paketen in der laufenden Oberfläche (nur automatische Tests).
 
+### Behoben
+
+- Einfache ZIP-Archive mit beschädigtem Inhalt galten als entpackt. Jetzt werden Länge und Prüfsumme (CRC32) jeder Datei geprüft, auch Ordnereinträge mit Daten gelten als Schaden. Dann heißt es „beschädigt“, es wird nichts übernommen und nichts entfernt.
+- `bsdtar` kann ein als beschädigt erkanntes ZIP, RAR oder 7z nicht mehr als entpackt durchwinken. Hat `bsdtar` ein ZIP oder RAR entpackt, bleiben die Archive liegen, weil es Schäden nicht sicher meldet.
+- Bekannte Grenze: Ein einteiliges RAR 4, das genau zwischen zwei Dateien abgeschnitten ist, wird mit weniger Dateien als entpackt gemeldet.
+
 ## d6Downloader 0.1.1 (2026-11-26)
 
 ### Behoben

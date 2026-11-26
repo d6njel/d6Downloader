@@ -174,6 +174,52 @@ public class DownloadManagerSmokeTests
         });
     }
 
+    /// <summary>Mit den echten Entpackern des Rechners: Keiner darf das beschädigte Archiv als entpackt durchwinken.</summary>
+    [Theory]
+    [InlineData(CompressionLevel.NoCompression)]
+    [InlineData(CompressionLevel.Optimal)]
+    public void A_zip_with_a_flipped_byte_is_never_deleted(CompressionLevel level)
+    {
+        using var dir = new TempDir();
+        string archive = dir.File("a.zip");
+        var data = new byte[4000];
+        new Random(3).NextBytes(data);
+        using (var zip = ZipFile.Open(archive, ZipArchiveMode.Create))
+        {
+            using var s = zip.CreateEntry("x.bin", level).Open();
+            s.Write(data);
+        }
+        var bytes = File.ReadAllBytes(archive);
+        bytes[2000] ^= 0xFF;
+        File.WriteAllBytes(archive, bytes);
+
+        var previous = SynchronizationContext.Current;
+        var ui = new QueueContext();
+        SynchronizationContext.SetSynchronizationContext(ui);
+        try
+        {
+            var manager = new DownloadManager(new FakeTimers(), ui, trash: new FakeTrash());
+            manager.Settings.DeleteArchivesAfterExtract = true;
+            manager.Settings.DeleteArchivesPermanently = true;
+            var item = new DownloadItem("http://127.0.0.1:1/a.zip", "a.zip", dir.Path);
+            manager.Add(new[] { item }, start: false);
+            item.Status = DownloadStatus.Completed;
+            item.FinalPath = archive;
+
+            manager.ExtractNow(new[] { item });
+            ui.RunUntil(() => item.Extract is not (ExtractState.None or ExtractState.Extracting));
+
+            Assert.Equal(ExtractState.Failed, item.Extract);
+            Assert.Equal(bytes, File.ReadAllBytes(archive));
+            Assert.False(Directory.Exists(ExtractPlanner.SingleTargetDir(archive)));
+            manager.Shutdown();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+    }
+
     /// <summary>Gegen ein echtes 7-Zip; ohne eines prüft der Test nichts.</summary>
     [Fact]
     public void A_missing_or_wrong_password_deletes_nothing_and_the_right_one_deletes_all_parts()

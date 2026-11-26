@@ -42,7 +42,8 @@ public static class ArchiveCleanup
     }
 
     /// <summary>
-    /// Nur nach <see cref="ExtractState.Done"/> ohne Fehler und mit mindestens einer entpackten Datei, sonst (0, 0).
+    /// Nur nach <see cref="ExtractState.Done"/> ohne Fehler und mit mindestens einer entpackten Datei, sonst (0, 0). Ist das
+    /// Ergebnis <see cref="ExtractResult.Unverified"/>, bleiben alle Teile.
     /// </summary>
     /// <param name="remove">Verschiebt eine Datei in den Papierkorb (siehe <c>ITrash</c>) oder löscht sie.</param>
     /// <param name="allOrNothing">
@@ -53,6 +54,7 @@ public static class ArchiveCleanup
         CancellationToken ct, bool allOrNothing = false)
     {
         if (result is not { State: ExtractState.Done, Failure: ExtractFailure.None, Files: > 0 }) return (0, 0);
+        if (result.Unverified) return (0, stamps.Count);
         if (allOrNothing && (ct.IsCancellationRequested || stamps.Count == 0 || !stamps.All(Untouched))) return (0, stamps.Count);
         int removed = 0;
         foreach (var stamp in stamps)

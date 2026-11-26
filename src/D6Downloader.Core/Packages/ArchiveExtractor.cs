@@ -21,8 +21,9 @@ public sealed record ExtractJob(string EntryPath, string TargetDir, ArchiveType 
 
 /// <param name="Detail">Kurzer Text des Entpackers bei <see cref="ExtractFailure.ToolFailed"/> und <see cref="ExtractFailure.Io"/> (höchstens 200 Zeichen), bei <see cref="ExtractFailure.NoSpace"/> „nötig|frei“ in Bytes, bei <see cref="ExtractState.NeedPassword"/> die Zahl der probierten Passwörter (fehlt bei 0).</param>
 /// <param name="UsedPassword">Das Passwort, mit dem entpackt wurde (nur im Speicher, null = keins nötig).</param>
+/// <param name="Unverified">Entpackt von einem Programm, das Schäden nicht sicher meldet (<c>bsdtar</c> bei ZIP und RAR): Das Archiv bleibt dann liegen.</param>
 public sealed record ExtractResult(ExtractState State, ExtractFailure Failure = ExtractFailure.None, string? Detail = null, int Files = 0,
-    string? UsedPassword = null);
+    string? UsedPassword = null, bool Unverified = false);
 
 /// <summary>
 /// Entpackt ein Paket in den Paketordner. Die Suche nach 7-Zip und <c>bsdtar</c> geschieht erst hier (über die Delegaten), nicht
@@ -128,10 +129,14 @@ public sealed partial class ArchiveExtractor
             string? usedPassword = null;
             var failures = new List<ExtractResult>();
             bool done = false;
+            bool unverified = false;
             for (int index = 0; index < chain.Count; index++)
             {
                 var kind = chain[index];
                 ct.ThrowIfCancellationRequested();
+                // bsdtar meldet bei beschädigten ZIP und RAR teils Erfolg: Ist die Datei wirklich von dieser Art, überstimmt es
+                // ein „beschädigt“ nie. Ist sie etwas anderes (etwa ein 7z mit der Endung .zip), darf es sie noch lesen.
+                if (kind == ExtractorKind.Tar && failures.Any(f => f.Failure == ExtractFailure.Corrupt) && HasSignature(job)) break;
                 if (failures.Count > 0) ClearDirectory(staging); // Reste des vorigen Versuchs
                 ExtractResult? stop;
                 try
@@ -152,7 +157,12 @@ public sealed partial class ArchiveExtractor
                 {
                     stop = new(ExtractState.Failed, ExtractFailure.ToolFailed, Short(ex.Message)); // Programm nicht startbar: der nächste darf es versuchen
                 }
-                if (stop is null) { done = true; break; }
+                if (stop is null)
+                {
+                    done = true;
+                    unverified = kind == ExtractorKind.Tar && job.Type != ArchiveType.SevenZip;
+                    break;
+                }
                 if (stop.Failure == ExtractFailure.PasswordNeedsTool)
                 {
                     // Nur 7-Zip (Passwort über die Standardeingabe) kann hier noch helfen, bsdtar nie.
@@ -176,7 +186,7 @@ public sealed partial class ArchiveExtractor
             if (files is null) return new(ExtractState.Failed, ExtractFailure.Link);
             ct.ThrowIfCancellationRequested();
             int moved = MoveOut(staging, job.TargetDir, ct);
-            return new(ExtractState.Done, Files: moved, UsedPassword: usedPassword);
+            return new(ExtractState.Done, Files: moved, UsedPassword: usedPassword, Unverified: unverified);
         }
         finally
         {
@@ -184,6 +194,20 @@ public sealed partial class ArchiveExtractor
             // Ein Zielordner, den erst dieser Lauf angelegt hat und der leer blieb (Fehler, Passwort, Abbruch), soll nicht herumliegen.
             if (created) TryDeleteIfEmpty(job.TargetDir);
         }
+    }
+
+    /// <summary>Beginnt die Datei so, wie es zu ihrer Art gehört?</summary>
+    private static bool HasSignature(ExtractJob job)
+    {
+        byte[] magic = job.Type switch
+        {
+            ArchiveType.Zip => "PK"u8.ToArray(),
+            ArchiveType.Rar => "Rar!"u8.ToArray(),
+            _ => new byte[] { (byte)'7', (byte)'z', 0xBC, 0xAF },
+        };
+        using var file = new FileStream(job.EntryPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        var head = new byte[magic.Length];
+        return file.ReadAtLeast(head, head.Length, throwOnEndOfStream: false) == head.Length && head.AsSpan().SequenceEqual(magic);
     }
 
     private static void TryDeleteIfEmpty(string dir)
@@ -224,9 +248,12 @@ public sealed partial class ArchiveExtractor
         foreach (var e in zip.Entries)
         {
             ct.ThrowIfCancellationRequested();
+            bool folder = e.FullName.EndsWith('/') || e.FullName.EndsWith('\\');
+            // Daten, die nirgends landen würden (Ordner oder Eintrag ohne Namen), gelten als Schaden.
+            if ((folder || e.FullName.Length == 0) && e.Length != 0) throw new InvalidDataException("Eintrag ohne Datei trägt Daten");
             if (e.FullName.Length == 0) continue;
             string full = PathGuard.Resolve(staging, e.FullName)!;
-            if (e.FullName.EndsWith('/') || e.FullName.EndsWith('\\'))
+            if (folder)
             {
                 Directory.CreateDirectory(full);
                 continue;
@@ -235,15 +262,18 @@ public sealed partial class ArchiveExtractor
             using var input = e.Open();
             using var output = new FileStream(full, FileMode.CreateNew, FileAccess.Write, FileShare.None);
             long written = 0;
+            uint crc = 0;
             int n;
             while ((n = input.Read(buffer, 0, buffer.Length)) > 0)
             {
                 written += n;
                 if (written > e.Length) throw new InvalidDataException("Eintrag größer als angegeben"); // Archivbombe mit falscher Größe
                 output.Write(buffer, 0, n);
+                crc = Crc32.Append(crc, buffer, n);
                 ct.ThrowIfCancellationRequested();
             }
             if (written != e.Length) throw new InvalidDataException("Eintrag kürzer als angegeben"); // abgeschnittenes Archiv
+            if (crc != e.Crc32) throw new InvalidDataException("Prüfsumme stimmt nicht"); // beschädigter Inhalt
         }
         return null;
     }
