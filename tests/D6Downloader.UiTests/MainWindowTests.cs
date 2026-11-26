@@ -1,11 +1,18 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.VisualTree;
+using D6Downloader.Controls;
 using D6Downloader.Downloads;
+using D6Downloader.Engine;
 using D6Downloader.Power;
 using D6Downloader.Sheets;
 using Xunit;
@@ -274,5 +281,44 @@ public class MainWindowTests
         inbox.Attach(message => ui.App.OnMessage(message));
 
         Assert.Single(ui.Sheet<AddSheet>().Rows);
+    }
+
+    [AvaloniaFact]
+    public void The_row_bar_fills_without_gaps_up_to_the_overall_progress()
+    {
+        using var ui = new Ui();
+        var item = Item(ui, "gross.iso", DownloadStatus.Paused);
+        item.TotalBytes = 4000;
+        ui.Downloads.Add(new[] { item }, start: false);
+        item.BeginRun();
+        // Vier Verbindungen, jede erst teilweise fertig: zusammen 40 %.
+        ((IProgress<DownloadProgress>)item).Report(new DownloadProgress(4000, 1600, 0,
+            new long[] { 600, 200, 600, 200 }, new long[] { 1000, 1000, 1000, 1000 }));
+        item.Tick(Environment.TickCount64);
+        Ui.Pump();
+        Ui.Pump();
+
+        var bar = Assert.Single(List(ui).GetVisualDescendants().OfType<SegmentBar>(), b => b.IsEffectivelyVisible);
+        var fill = Assert.IsAssignableFrom<ISolidColorBrush>(bar.Fill).Color;
+        using var frame = ui.Window.CaptureRenderedFrame()!;
+        using var buffer = frame.Lock();
+        var origin = bar.TranslatePoint(new Point(0, 0), ui.Window)!.Value;
+        double scale = ui.Window.RenderScaling;
+        int left = (int)Math.Ceiling(origin.X * scale), width = (int)(bar.Bounds.Width * scale);
+        int y = (int)((origin.Y + bar.Bounds.Height / 2) * scale);
+        Color Pixel(int x)
+        {
+            int value = Marshal.ReadInt32(buffer.Address, y * buffer.RowBytes + (left + x) * 4);
+            byte b0 = (byte)value, b1 = (byte)(value >> 8), b2 = (byte)(value >> 16);
+            return buffer.Format == PixelFormat.Rgba8888 ? Color.FromRgb(b0, b1, b2) : Color.FromRgb(b2, b1, b0);
+        }
+
+        Assert.Equal(0.4, item.Fraction, 3);
+        int end = (int)(width * item.Fraction);
+        var track = Pixel(width - 4);
+        Assert.NotEqual(fill, track);
+        // Kleiner Abstand zu den runden Enden und zur Kante der Füllung.
+        for (int x = 3; x < end - 3; x++) Assert.True(Pixel(x) == fill, $"Lücke bei {x} von {width}");
+        for (int x = end + 3; x < width - 3; x++) Assert.True(Pixel(x) == track, $"Füllung hinter dem Fortschritt bei {x} von {width}");
     }
 }

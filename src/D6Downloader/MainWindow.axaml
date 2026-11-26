@@ -135,7 +135,7 @@
                                                     <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
                                                                ToolTip.Tip="{Binding FileName}"/>
                                                     <c:SegmentBar Margin="0,5" Opacity="1" IsVisible="{Binding !BarHidden}"
-                                                                  Progress="{Binding Progress}" Fraction="{Binding Fraction}"/>
+                                                                  Fraction="{Binding Fraction}"/>
                                                     <TextBlock Classes="secondary detail" Text="{Binding DetailText}"
                                                                TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DetailText}"/>
                                                 </StackPanel>

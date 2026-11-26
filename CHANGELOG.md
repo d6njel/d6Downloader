@@ -1,5 +1,11 @@
 # Changelog
 
+## d6Downloader 0.1.1 (2026-11-26)
+
+### Behoben
+
+- Der Fortschrittsbalken der Download-Liste zeigte bei mehreren Verbindungen Teilstücke mit Lücken. Er füllt sich jetzt lückenlos von links nach dem Gesamtfortschritt, auch bei pausierten Downloads. Die Detailansicht zeigt die Verbindungen weiterhin einzeln.
+
 ## d6Downloader 0.1.0 (in Arbeit, noch nicht veröffentlicht)
 
 Vorabfassung, siehe [README](README.md) und [DOKUMENTATION](DOKUMENTATION.md).
