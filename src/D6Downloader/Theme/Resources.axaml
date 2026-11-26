@@ -1,0 +1,87 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Freie Icon-Schrift "Fluent System Icons" (MIT, Lizenz in Assets/Fonts) -->
+    <FontFamily x:Key="FontIcons">avares://d6downloader/Assets/Fonts#FluentSystemIcons-Regular</FontFamily>
+
+    <x:String x:Key="IconAdd">&#xF109;</x:String>
+    <x:String x:Key="IconPlay">&#xF605;</x:String>
+    <x:String x:Key="IconPause">&#xF5A1;</x:String>
+    <x:String x:Key="IconRetry">&#xF13D;</x:String>
+    <x:String x:Key="IconFolder">&#xF418;</x:String>
+    <x:String x:Key="IconDelete">&#xF34C;</x:String>
+    <x:String x:Key="IconClear">&#xF201;</x:String>
+    <x:String x:Key="IconDownload">&#xF150;</x:String>
+    <x:String x:Key="IconEdit">&#xF3DD;</x:String>
+    <x:String x:Key="IconChevronRight">&#xF2B0;</x:String>
+    <x:String x:Key="IconChevronDown">&#xF2A3;</x:String>
+    <x:String x:Key="IconPaste">&#xF2D5;</x:String>
+    <x:String x:Key="IconTag">&#xF77C;</x:String>
+    <x:String x:Key="IconAll">&#xF4ED;</x:String>
+    <x:String x:Key="IconDone">&#xF298;</x:String>
+    <x:String x:Key="IconWarning">&#xF869;</x:String>
+    <x:String x:Key="IconActive">&#xF150;</x:String>
+    <x:String x:Key="IconQueue">&#xF2DD;</x:String>
+    <x:String x:Key="IconSettings">&#xF6A9;</x:String>
+    <x:String x:Key="IconPower">&#xF60E;</x:String>
+    <x:String x:Key="IconKey">&#xF4B6;</x:String>
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="WindowBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="BarBackground" Color="#F3F3F3"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#F5F5F7"/>
+            <SolidColorBrush x:Key="SeparatorBrush" Color="#E5E5EA"/>
+            <SolidColorBrush x:Key="TextPrimary" Color="#1C1C1E"/>
+            <SolidColorBrush x:Key="TextSecondary" Color="#636368"/>
+            <SolidColorBrush x:Key="TextTertiary" Color="#76767C"/>
+            <SolidColorBrush x:Key="Accent" Color="#0A6FDB"/>
+            <SolidColorBrush x:Key="AccentSoft" Color="#1F0A84FF"/>
+            <SolidColorBrush x:Key="Success" Color="#28C840"/>
+            <SolidColorBrush x:Key="Warning" Color="#F59E0B"/>
+            <SolidColorBrush x:Key="Error" Color="#FF3B30"/>
+            <SolidColorBrush x:Key="TextWarning" Color="#A04B08"/>
+            <SolidColorBrush x:Key="TextSuccess" Color="#1A7F37"/>
+            <SolidColorBrush x:Key="TextError" Color="#C5000F"/>
+            <SolidColorBrush x:Key="RowHover" Color="#0A000000"/>
+            <SolidColorBrush x:Key="RowSelected" Color="#260A84FF"/>
+            <SolidColorBrush x:Key="BadgeBackground" Color="#EFEFF4"/>
+            <SolidColorBrush x:Key="BadgeText" Color="#636368"/>
+            <SolidColorBrush x:Key="BarTrack" Color="#E5E5EA"/>
+            <SolidColorBrush x:Key="BarPaused" Color="#AEAEB2"/>
+            <SolidColorBrush x:Key="InputBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="InputBorder" Color="#D1D1D6"/>
+            <SolidColorBrush x:Key="SheetBackground" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="Backdrop" Color="#40000000"/>
+            <SolidColorBrush x:Key="GraphFill" Color="#330A84FF"/>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="WindowBackground" Color="#1E1E20"/>
+            <SolidColorBrush x:Key="BarBackground" Color="#2A2A2D"/>
+            <SolidColorBrush x:Key="SidebarBackground" Color="#252527"/>
+            <SolidColorBrush x:Key="SeparatorBrush" Color="#38383A"/>
+            <SolidColorBrush x:Key="TextPrimary" Color="#F2F2F7"/>
+            <SolidColorBrush x:Key="TextSecondary" Color="#A8A8AF"/>
+            <SolidColorBrush x:Key="TextTertiary" Color="#8E8E93"/>
+            <SolidColorBrush x:Key="Accent" Color="#0A84FF"/>
+            <SolidColorBrush x:Key="AccentSoft" Color="#330A84FF"/>
+            <SolidColorBrush x:Key="Success" Color="#32D74B"/>
+            <SolidColorBrush x:Key="Warning" Color="#FFB340"/>
+            <SolidColorBrush x:Key="Error" Color="#FF453A"/>
+            <SolidColorBrush x:Key="TextWarning" Color="#FFB340"/>
+            <SolidColorBrush x:Key="TextSuccess" Color="#32D74B"/>
+            <SolidColorBrush x:Key="TextError" Color="#FF6961"/>
+            <SolidColorBrush x:Key="RowHover" Color="#0DFFFFFF"/>
+            <SolidColorBrush x:Key="RowSelected" Color="#400A84FF"/>
+            <SolidColorBrush x:Key="BadgeBackground" Color="#3A3A3C"/>
+            <SolidColorBrush x:Key="BadgeText" Color="#C7C7CC"/>
+            <SolidColorBrush x:Key="BarTrack" Color="#3A3A3C"/>
+            <SolidColorBrush x:Key="BarPaused" Color="#636366"/>
+            <SolidColorBrush x:Key="InputBackground" Color="#242426"/>
+            <SolidColorBrush x:Key="InputBorder" Color="#48484A"/>
+            <SolidColorBrush x:Key="SheetBackground" Color="#2C2C2E"/>
+            <SolidColorBrush x:Key="Backdrop" Color="#73000000"/>
+            <SolidColorBrush x:Key="GraphFill" Color="#400A84FF"/>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

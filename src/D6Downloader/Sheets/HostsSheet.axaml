@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             xmlns:s="clr-namespace:D6Downloader.Sheets"
+             x:Class="D6Downloader.Sheets.HostsSheet"
+             Width="590">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,Auto">
+        <TextBlock Classes="title" Text="{l:Str Hosts.Title}"/>
+        <TextBlock Grid.Row="1" Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap" Text="{l:Str Hosts.Intro}"/>
+        <Grid Grid.Row="2" ColumnDefinitions="220,180,*" Margin="0,14,0,0">
+            <TextBlock Text="{l:Str Hosts.PerHost}" VerticalAlignment="Center" TextWrapping="Wrap"
+                       ToolTip.Tip="{l:Str Hosts.PerHostTip}"/>
+            <ComboBox x:Name="DefaultBox" Grid.Column="1"/>
+        </Grid>
+        <Grid Grid.Row="3" ColumnDefinitions="170,8,92,8,92,8,*,34" Margin="0,14,0,0">
+            <TextBlock Classes="label" Text="{l:Str Hosts.ColHost}" TextWrapping="Wrap"/>
+            <TextBlock Grid.Column="2" Classes="label" Text="{l:Str Hosts.ColConnections}" TextWrapping="Wrap"/>
+            <TextBlock Grid.Column="4" Classes="label" Text="{l:Str Hosts.ColLimit}" TextWrapping="Wrap"/>
+            <TextBlock Grid.Column="6" Classes="label" Text="{l:Str Hosts.ColAgent}" TextWrapping="Wrap"/>
+        </Grid>
+        <ScrollViewer Grid.Row="4" MaxHeight="260">
+            <ItemsControl x:Name="Rows">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="s:HostRow">
+                        <Grid ColumnDefinitions="170,8,92,8,92,8,*,34" Margin="0,0,0,6">
+                            <TextBox Text="{Binding Host}" PlaceholderText="example.com"/>
+                            <TextBox Grid.Column="2" Text="{Binding Connections}" PlaceholderText="{l:Str Hosts.HintDefault}"/>
+                            <TextBox Grid.Column="4" Text="{Binding SpeedKBps}" PlaceholderText="{l:Str Hosts.HintUnlimited}"/>
+                            <TextBox Grid.Column="6" Text="{Binding UserAgent}" PlaceholderText="{l:Str Hosts.HintDefault}"/>
+                            <Button Grid.Column="7" Classes="icon" Content="{StaticResource IconDelete}"
+                                    ToolTip.Tip="{l:Str Hosts.DeleteTip}" Click="DeleteRow_Click"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Button Grid.Row="5" Content="{l:Str Hosts.AddRow}" Margin="0,4,0,0" Click="AddRow_Click"/>
+        <TextBlock Grid.Row="6" x:Name="ErrorText" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+        <StackPanel Grid.Row="7" Classes="buttons">
+            <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+            <Button Content="{l:Str Common.Apply}" Classes="accent" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

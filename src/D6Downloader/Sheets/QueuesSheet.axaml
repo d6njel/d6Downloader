@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             xmlns:s="clr-namespace:D6Downloader.Sheets"
+             x:Class="D6Downloader.Sheets.QueuesSheet"
+             Width="590">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
+        <TextBlock Classes="title" Text="{l:Str Queues.Title}"/>
+        <TextBlock Grid.Row="1" Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap" Text="{l:Str Queues.Intro}"/>
+        <Grid Grid.Row="2" ColumnDefinitions="*,8,110,34" Margin="0,14,0,0">
+            <TextBlock Classes="label" Text="{l:Str Categories.Name}"/>
+            <TextBlock Grid.Column="2" Classes="label" Text="{l:Str Queues.ColConcurrent}"/>
+        </Grid>
+        <ScrollViewer Grid.Row="3" MaxHeight="300">
+            <StackPanel>
+                <ItemsControl x:Name="Rows">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="s:QueueRow">
+                            <StackPanel Margin="0,0,0,12" Spacing="4">
+                                <Grid ColumnDefinitions="*,8,110,34">
+                                    <TextBox Text="{Binding Name}" PlaceholderText="{l:Str Queues.NameHint}"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Concurrent}" PlaceholderText="{l:Str Hosts.HintDefault}"
+                                             ToolTip.Tip="{l:Str Queues.ConcurrentTip}"/>
+                                    <Button Grid.Column="3" Classes="icon" Content="{StaticResource IconDelete}"
+                                            ToolTip.Tip="{l:Str Queues.DeleteTip}" Click="DeleteRow_Click"/>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <CheckBox Content="{l:Str Queues.Schedule}" IsChecked="{Binding HasSchedule}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding HasSchedule}">
+                                        <TextBlock Classes="secondary" Text="{l:Str Queues.From}" VerticalAlignment="Center"/>
+                                        <TextBox Width="70" MinWidth="0" Text="{Binding Start}" PlaceholderText="02:00"/>
+                                        <TextBlock Classes="secondary" Text="{l:Str Queues.To}" VerticalAlignment="Center"/>
+                                        <TextBox Width="70" MinWidth="0" Text="{Binding Stop}" PlaceholderText="{l:Str Queues.HintOpen}"
+                                                 ToolTip.Tip="{l:Str Queues.StopTip}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <WrapPanel IsVisible="{Binding HasSchedule}">
+                                    <CheckBox Content="{l:Str Day.Mon}" IsChecked="{Binding Mon}" Margin="0,0,12,0" MinWidth="0"/>
+                                    <CheckBox Content="{l:Str Day.Tue}" IsChecked="{Binding Tue}" Margin="0,0,12,0" MinWidth="0"/>
+                                    <CheckBox Content="{l:Str Day.Wed}" IsChecked="{Binding Wed}" Margin="0,0,12,0" MinWidth="0"/>
+                                    <CheckBox Content="{l:Str Day.Thu}" IsChecked="{Binding Thu}" Margin="0,0,12,0" MinWidth="0"/>
+                                    <CheckBox Content="{l:Str Day.Fri}" IsChecked="{Binding Fri}" Margin="0,0,12,0" MinWidth="0"/>
+                                    <CheckBox Content="{l:Str Day.Sat}" IsChecked="{Binding Sat}" Margin="0,0,12,0" MinWidth="0"/>
+                                    <CheckBox Content="{l:Str Day.Sun}" IsChecked="{Binding Sun}" Margin="0,0,12,0" MinWidth="0"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock x:Name="EmptyText" Classes="secondary tertiary" Text="{l:Str Queues.Empty}" Margin="0,4,0,4"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Button Grid.Row="4" Content="{l:Str Queues.AddRow}" Margin="0,4,0,0" Click="AddRow_Click"/>
+        <TextBlock Grid.Row="5" x:Name="ErrorText" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+        <StackPanel Grid.Row="6" Classes="buttons">
+            <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+            <Button Content="{l:Str Common.Apply}" Classes="accent" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

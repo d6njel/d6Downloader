@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>D6Downloader</RootNamespace>
+    <Version>0.1.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="D6Downloader.Tests" />
+    <InternalsVisibleTo Include="D6Downloader.UiTests" />
+    <InternalsVisibleTo Include="D6Downloader.Platform.Linux" />
+    <InternalsVisibleTo Include="d6downloader" />
+  </ItemGroup>
+
+  <!-- Sprachdateien: eingebettet, eine Datei je Sprache, siehe Loc.cs. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Languages\*.json" LogicalName="Lang.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

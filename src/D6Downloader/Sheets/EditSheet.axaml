@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.EditSheet"
+             Width="560">
+    <ScrollViewer>
+        <StackPanel>
+            <TextBlock x:Name="Heading" Classes="title" TextTrimming="CharacterEllipsis"/>
+            <TextBlock x:Name="Info" Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap"/>
+
+            <StackPanel x:Name="NamePanel" Margin="0,12,0,0">
+                <TextBlock Classes="label" Text="{l:Str Edit.FileName}"/>
+                <TextBox x:Name="NameBox"/>
+            </StackPanel>
+
+            <TextBlock Classes="label" Text="{l:Str Add.SaveIn}" Margin="0,12,0,3"/>
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="FolderBox"/>
+                <Button x:Name="BrowseButton" Grid.Column="1" Content="{l:Str Common.BrowseFolder}" Margin="8,0,0,0" Click="Browse_Click"/>
+            </Grid>
+
+            <StackPanel x:Name="UrlPanel" Margin="0,12,0,0">
+                <TextBlock Classes="label" Text="{l:Str Detail.Link}"/>
+                <TextBox x:Name="UrlBox" TextChanged="UrlBox_TextChanged"/>
+                <TextBlock x:Name="UrlHint" Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap" Text="{l:Str Edit.UrlHint}"
+                           IsVisible="False"/>
+            </StackPanel>
+
+            <Grid ColumnDefinitions="*,12,*" Margin="0,12,0,0">
+                <StackPanel>
+                    <TextBlock Classes="label" Text="{l:Str Common.Category}"/>
+                    <ComboBox x:Name="CategoryBox"/>
+                </StackPanel>
+                <StackPanel x:Name="ChecksumPanel" Grid.Column="2">
+                    <TextBlock Classes="label" Text="{l:Str Detail.Checksum}"/>
+                    <TextBox x:Name="ChecksumBox" PlaceholderText="{l:Str Edit.ChecksumHint}"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock x:Name="LockHint" Classes="secondary" Margin="0,8,0,0" TextWrapping="Wrap" Text="{l:Str Edit.LockHint}"
+                       IsVisible="False"/>
+            <TextBlock x:Name="ErrorText" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+
+            <StackPanel Classes="buttons">
+                <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+                <Button x:Name="SaveButton" Content="{l:Str Common.Apply}" Classes="accent" IsDefault="True" Click="Save_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

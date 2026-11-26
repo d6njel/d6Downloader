@@ -1,0 +1,128 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.SettingsSheet"
+             Width="590">
+    <!-- Die Einstellungen scrollen, die Knöpfe bleiben immer sichtbar. -->
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <TextBlock Classes="title" Text="{l:Str Settings.Title}"/>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="0,0,14,0">
+
+                <!-- Konten zuerst: Rapidgator soll man sofort finden. -->
+                <TextBlock Classes="section" Text="{l:Str Settings.Accounts}"/>
+                <WrapPanel>
+                    <Button x:Name="RapidgatorButton" Classes="accent" Content="{l:Str Settings.RapidgatorButton}" Margin="0,0,8,4"
+                            Click="Rapidgator_Click"/>
+                    <Button Content="{l:Str Settings.DebridButton}" ToolTip.Tip="{l:Str Settings.DebridTip}" Margin="0,0,8,4"
+                            Click="Debrid_Click"/>
+                    <Button Content="{l:Str Settings.HostsButton}" ToolTip.Tip="{l:Str Settings.HostsTip}" Margin="0,0,8,4"
+                            Click="Hosts_Click"/>
+                    <Button Content="{l:Str Settings.BrowserButton}" ToolTip.Tip="{l:Str Settings.BrowserTip}" Margin="0,0,8,4"
+                            Click="Browser_Click"/>
+                </WrapPanel>
+
+                <TextBlock Classes="section" Text="{l:Str Settings.Section.General}"/>
+                <Grid ColumnDefinitions="170,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Classes="rowLabel" Text="{l:Str Settings.DownloadFolder}"/>
+                    <Grid Grid.Column="1" ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+                        <TextBox x:Name="FolderBox"/>
+                        <Button Grid.Column="1" Content="{l:Str Common.BrowseFolder}" Margin="8,0,0,0" Click="BrowseFolder_Click"/>
+                    </Grid>
+                    <TextBlock Classes="rowLabel" Grid.Row="1" Text="{l:Str Settings.Concurrent}"/>
+                    <ComboBox x:Name="ConcurrentBox" Grid.Row="1" Grid.Column="1" Width="190" HorizontalAlignment="Left" Margin="0,0,0,6"/>
+                    <TextBlock Classes="rowLabel" Grid.Row="2" Text="{l:Str Settings.Theme}"/>
+                    <ComboBox x:Name="ThemeBox" Grid.Row="2" Grid.Column="1" Width="190" HorizontalAlignment="Left" Margin="0,0,0,6"/>
+                    <TextBlock Classes="rowLabel" Grid.Row="3" Text="{l:Str Settings.Scale}"/>
+                    <ComboBox x:Name="ScaleBox" Grid.Row="3" Grid.Column="1" Width="190" HorizontalAlignment="Left" Margin="0,0,0,6"/>
+                    <TextBlock Classes="rowLabel" Grid.Row="4" Text="{l:Str Settings.Language}"/>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,0,0,6">
+                        <ComboBox x:Name="LanguageBox" Width="190"/>
+                        <TextBlock Classes="secondary" Text="{l:Str Settings.LanguageHint}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Classes="section" Text="{l:Str Settings.Section.System}"/>
+                <Grid ColumnDefinitions="170,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Classes="rowLabel" Text="{l:Str Settings.Login}"/>
+                    <CheckBox x:Name="AutostartBox" Grid.Column="1" Content="{l:Str Settings.Autostart}" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="1" Classes="rowLabel" Text="{l:Str Settings.CloseWindow}"/>
+                    <ComboBox x:Name="CloseBox" Grid.Row="1" Grid.Column="1" Width="190" HorizontalAlignment="Left" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="2" Classes="rowLabel" Text="{l:Str Settings.OnStart}"/>
+                    <CheckBox x:Name="ResumeBox" Grid.Row="2" Grid.Column="1" Content="{l:Str Settings.Resume}"
+                              ToolTip.Tip="{l:Str Settings.ResumeTip}" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="3" Classes="rowLabel" Text="{l:Str Settings.Power}"/>
+                    <CheckBox x:Name="KeepAwakeBox" Grid.Row="3" Grid.Column="1" Content="{l:Str Settings.KeepAwake}"
+                              ToolTip.Tip="{l:Str Settings.KeepAwakeTip}" Margin="0,0,0,6"/>
+
+                    <!-- Regeln „Automatisch abwählen“: eine Zeile je Regel, Schreibweise wie im Filterfeld -->
+                    <TextBlock Grid.Row="4" Classes="rowLabel" Text="{l:Str Settings.AutoDeselect}" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,0,0,6" Spacing="4">
+                        <TextBox x:Name="RulesBox" AcceptsReturn="True" TextWrapping="NoWrap" VerticalContentAlignment="Top"
+                                 Height="64" PlaceholderText="{l:Str Settings.AutoDeselectHint}"/>
+                        <TextBlock Classes="secondary" Text="{l:Str Settings.AutoDeselectNote}" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="5" Classes="rowLabel" Text="{l:Str Settings.Data}" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,0,0,6">
+                        <CheckBox x:Name="PortableBox" Content="{l:Str Settings.Portable}" ToolTip.Tip="{l:Str Settings.PortableTip}"/>
+                        <TextBlock x:Name="DataDirText" Classes="secondary" TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="6" Classes="rowLabel" Text="{l:Str Settings.Extract}" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Row="6" Grid.Column="1" Margin="0,0,0,6" Spacing="4">
+                        <CheckBox x:Name="AutoExtractBox" Content="{l:Str Settings.AutoExtract}" ToolTip.Tip="{l:Str Settings.AutoExtractTip}"/>
+                        <CheckBox x:Name="DeleteArchivesBox" Content="{l:Str Settings.DeleteArchives}" ToolTip.Tip="{l:Str Settings.DeleteArchivesTip}"/>
+                        <TextBox x:Name="SevenZipBox" PlaceholderText="{l:Str Settings.SevenZipHint}"/>
+                    </StackPanel>
+
+                    <!-- Passwortliste für geschützte Archive: ein Passwort je Zeile, gespeichert nur verschlüsselt -->
+                    <TextBlock Grid.Row="7" Classes="rowLabel" Text="{l:Str Settings.ArchivePasswords}" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,0,0,6" Spacing="4">
+                        <TextBox x:Name="PasswordsBox" AcceptsReturn="True" TextWrapping="NoWrap" VerticalContentAlignment="Top"
+                                 Height="64" PlaceholderText="{l:Str Settings.ArchivePasswordsHint}"/>
+                        <TextBlock x:Name="PasswordsNote" Classes="secondary" Text="{l:Str Settings.ArchivePasswordsNote}" TextWrapping="Wrap"/>
+                        <!-- unar/lsar nehmen ein Passwort nur auf der Befehlszeile; ab Werk aus -->
+                        <CheckBox x:Name="UnarPasswordBox" Content="{l:Str Settings.UnarPassword}"/>
+                        <TextBlock Classes="secondary" Text="{l:Str Settings.UnarPasswordNote}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Classes="section" Text="{l:Str Settings.Section.Services}"/>
+                <Grid ColumnDefinitions="170,*" RowDefinitions="Auto,Auto">
+                    <TextBlock Classes="rowLabel" Text="{l:Str Settings.ClickNLoad}" VerticalAlignment="Top"/>
+                    <StackPanel Grid.Column="1" Margin="0,0,0,6">
+                        <CheckBox x:Name="ClickNLoadBox" Content="{l:Str Settings.ClickNLoadBox}" ToolTip.Tip="{l:Str Settings.ClickNLoadTip}"/>
+                        <TextBlock x:Name="ClickNLoadStatus" Classes="secondary error" TextWrapping="Wrap" IsVisible="False"/>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Classes="rowLabel" Text="{l:Str Settings.Clipboard}" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="ClipboardBox" Grid.Row="1" Grid.Column="1" Content="{l:Str Settings.ClipboardBox}"
+                              ToolTip.Tip="{l:Str Settings.ClipboardTip}" Margin="0,0,0,6"/>
+                </Grid>
+
+                <TextBlock Classes="section" Text="{l:Str Settings.Section.Notifications}"/>
+                <Grid ColumnDefinitions="170,*">
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="{l:Str Settings.Notify}" TextWrapping="Wrap"/>
+                        <TextBlock Classes="secondary" Text="{l:Str Settings.NotifyHint}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <CheckBox x:Name="NotifyCompletedBox" Content="{l:Str Settings.NotifyCompleted}"/>
+                        <CheckBox x:Name="NotifyFailedBox" Content="{l:Str Settings.NotifyFailed}"/>
+                        <CheckBox x:Name="NotifyAllDoneBox" Content="{l:Str Settings.NotifyAllDone}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Über: Version und Herkunft (Text aus NOTICE.md) -->
+                <SelectableTextBlock x:Name="AboutText" FontSize="11.5" Foreground="{DynamicResource TextSecondary}"
+                                     TextWrapping="Wrap" Margin="0,16,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <TextBlock x:Name="ErrorText" Grid.Row="2" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+        <StackPanel Grid.Row="3" Classes="buttons">
+            <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+            <Button x:Name="SaveButton" Content="{l:Str Common.Apply}" Classes="accent" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

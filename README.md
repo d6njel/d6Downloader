@@ -1,63 +1,167 @@
-**YDownloader** is a lean, fast download manager for Windows 11 (C# .NET 8, WPF) with a link grabber, archive extraction, a browser extension for Chrome and Firefox, Click'n'Load and AllDebrid support. Get the latest version from the [Releases page](https://github.com/yusa1905/YDownloader/releases/latest).
+# d6Downloader
 
-![Main window](https://raw.githubusercontent.com/yusa1905/YDownloader/main/assets/screenshots/main.png)
+d6Downloader ist ein Download-Manager für Linux: Links sammeln, mehrteilige Archive als Paket erkennen,
+Dateien mit mehreren Verbindungen laden, anhalten und fortsetzen, danach automatisch entpacken.
+Entwickelt und geprüft wird er unter Nobara/Fedora 44 (KDE).
 
-## Highlights
+![Hauptfenster](docs/screenshots/main-dark.png)
 
-- **Downloads:** multiple connections per file, resume, checksums, queues with schedules and limits, per-host limits, "after completion" actions (shut down, hibernate, sleep) and keep-awake.
-- **Link grabber and packages:** the Add dialog detects multi-part archives (`.partN.rar`, `.rar` + `.r00`, `.7z.001`, `.zip.001`, `.z01`), groups them into packages with their own folder and shows missing parts. It offers filters (`ext:`, `size>`, `host:`, `status:`), auto-deselect rules and an online check via AllDebrid.
-- **Archive extraction:** automatic after download (can be turned off). Plain ZIP works out of the box with .NET. Multi-part and password-protected archives need an installed 7-Zip. Single-part RAR and 7z use 7-Zip, with Windows `tar.exe` as a fallback, and `tar.exe` also stands in for ZIP files that use compression methods .NET cannot read (for example Zstandard). The order is .NET, 7-Zip, `tar.exe`. Archives are never deleted, existing files are never overwritten, unsafe paths are rejected.
-- **Archive passwords:** a list in Settings (encrypted for your Windows account), a password entered from the row menu, and passwords sent along by Click'n'Load. They are tried in turn and passed to 7-Zip through standard input, never on the command line.
-- **Browser extension** for Chrome and Firefox: right-click a link, image, video, audio or selected text. Links land in the Add dialog, nothing starts until you confirm.
-- **Click'n'Load** (off by default): listens on `127.0.0.1:9666` only, including AES-encrypted links.
-- **Clipboard check** (off by default): shows a notice with the number of matching links only; nothing is downloaded until you confirm.
-- **AllDebrid** support (API key stored encrypted).
-- **Interface:** light and dark theme, UI scaling 80–200 %, tray icon, autostart, self-drawn speed graph, remaining time and free disk space at a glance. Available in English, German, Spanish, French, Italian, Brazilian Portuguese and Turkish.
-- **Portable mode:** put an empty file named `.portable` next to the exe and all data stays in the program folder.
+Die Bilder in [docs/screenshots](docs/screenshots) sind ohne Bildschirm gezeichnet, alle Daten darin sind ausgedacht.
 
-## Performance
+Alle Bilder:
+[Hauptfenster](docs/screenshots/main-dark.png),
+[Hinzufügen](docs/screenshots/add-dark.png),
+[Einstellungen](docs/screenshots/settings-dark.png),
+[Rapidgator-Anmeldung](docs/screenshots/rapidgator-signin-dark.png),
+[Rapidgator-Konto](docs/screenshots/rapidgator-account-dark.png),
+[Details](docs/screenshots/x-detail-dark.png),
+[Bearbeiten](docs/screenshots/x-edit-dark.png),
+[AllDebrid](docs/screenshots/x-debrid-dark.png),
+[Hoster](docs/screenshots/x-hosts-dark.png),
+[Browser verbinden](docs/screenshots/x-browser-dark.png),
+[Kategorien](docs/screenshots/x-categories-dark.png),
+[Warteschlangen](docs/screenshots/x-queues-dark.png),
+[Passwort](docs/screenshots/x-password-dark.png),
+[Nach Abschluss](docs/screenshots/x-after-dark.png).
 
-Measured on one machine (Windows 11), Release build (ReadyToRun, win-x64), portable copy, empty list, one run per package (1.0.0 and 1.0.1), three minutes idle: the window is visible after about 320 ms. Private working set is about 60–64 MB; the working set, which includes shared pages such as the graphics driver and runtime, is about 130–136 MB. Other machines, drivers and lists will differ, and running downloads use more.
+## Installieren
 
-## Downloads
-
-| File | Size | Notes |
-|---|---|---|
-| `YDownloader-1.0.1-framework-dependent.zip` | ~1 MB | Needs the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (x64) |
-| `YDownloader-1.0.1-self-contained.zip` | ~62 MB | Runs without any installed runtime |
-
-Requires Windows 11 (x64). Extract the zip anywhere and run `YDownloader.exe`. There is no installer; data lives in `%AppData%\YDownloader` unless you use portable mode.
-
-> **Note:** `YDownloader.exe` is not code-signed, so Windows SmartScreen may warn on first start ("More info" → "Run anyway"). Compare the SHA-256 of your download with the values below.
-
-## Browser extension
-
-The extension is in the `Extension` folder next to the exe.
-
-1. In YDownloader open Settings (Ctrl+,) → Services → Browser and press *Connect*. This registers the native messaging host for the current user only (`HKCU`).
-2. **Chrome / Chromium:** open `chrome://extensions`, enable *Developer mode*, choose *Load unpacked* and select the `Extension` folder.
-3. **Firefox:** open `about:debugging`, choose *This Firefox* → *Load Temporary Add-on* and select `Extension\firefox\manifest.json`. Firefox keeps it only until it is closed; a permanent install would need a signature.
-
-If you move the program folder, press *Update* in the same settings page.
-
-## Known limitations
-
-- RAR extraction has not been tested with real archives yet.
-- No cookies or referer for downloads, so files behind a login are not supported.
-- No DLC support.
-- Archive passwords are briefly held in memory by YDownloader and 7-Zip.
-- The AllDebrid integration follows the documentation and has not been run against the live service.
-- Translations have not been reviewed by native speakers.
-
-## SHA-256
+Ohne sudo (vorher einmalig die Werkzeuge einschließlich `git`, siehe unten).
 
 ```
-754c91cfd8fd35cdea4578a1c998e604cab09bb762af87d8c69743a117cda505  YDownloader-1.0.1-framework-dependent.zip
-807342ee7252b01a908f36c91d891a522160c155e302de57df36ea8bcdbe1cdc  YDownloader-1.0.1-self-contained.zip
+git clone https://github.com/d6njel/d6Downloader.git ~/d6Downloader
+cd ~/d6Downloader
+./tools/publish.sh
+./tools/install.sh
 ```
 
-Also attached as `SHA256SUMS.txt`.
+Die ausführliche Anleitung für Installation, Browser, Rapidgator, Deinstallation, Datenpfade und Sicherheitsgrenzen steht
+in **[DOKUMENTATION.md](DOKUMENTATION.md)**.
 
-## Disclaimer
+## Aktueller Stand
 
-YDownloader is an independent project and is not affiliated with AllDebrid, JDownloader or Apple. Names are used only to describe compatibility. Intended for legal content only; you are responsible for what you download. Licensed under the [MIT License](https://github.com/yusa1905/YDownloader/blob/main/LICENSE).
+Es ist eine Vorabfassung. **Automatisch geprüft** sind die Programmlogik und die Fenster (ohne Bildschirm, gegen
+Attrappen). Die fertige Programmdatei wurde in einer unsichtbaren KDE-Testsitzung gestartet (Browser-Aufruf, `--add`,
+zweiter Start, Beenden).
+
+**Noch nicht in Wirklichkeit ausprobiert:**
+
+- Bedienung auf einem echten KDE-Desktop (Maus, Tastatur, Hell/Dunkel, Skalierung), Startmenü-Eintrag
+- Tray-Symbol, Benachrichtigungen, Zwischenablage-Überwachung, Drag & Drop aus dem Browser, Dateidialoge,
+  „Im Ordner zeigen“, Click'n'Load
+- Archive nach dem Entpacken in den Papierkorb verschieben (ab Werk aus, braucht `gio`): mit einem echten Papierkorb
+  ungeprüft
+- Wachhalten, Herunterfahren, Standby, Autostart
+- Browser-Erweiterung in einem echten Firefox und Chrome
+- Rapidgator (nur gegen eine Attrappe), AllDebrid (nur gegen eine Attrappe)
+- Entpacken: verschlüsseltes RAR mit richtigem Passwort, komprimiertes mehrteiliges RAR 4 bis zum Ergebnis, große echte
+  Pakete (Einzelheiten in [DOKUMENTATION.md](DOKUMENTATION.md), Abschnitt 9)
+
+**Entpacken:** ZIP und 7z wie gehabt (eingebaut bzw. 7-Zip), RAR mit `unar`/`lsar`, weil das 7-Zip von Fedora kein RAR
+kann. Passwortgeschützte RAR brauchen eine Einstellung, die ab Werk aus ist: `unar` nimmt das Passwort nur auf der
+Befehlszeile an, wo es in der Prozessliste sichtbar ist.
+
+**Einschränkungen:**
+
+- Wayland: Das Programm läuft über XWayland. Das Fenster nach vorn zu holen und die Zwischenablage im Hintergrund zu
+  lesen, kann das System verhindern.
+- Die Skalierung in den Einstellungen wirkt auf das Fenster, nicht auf Menüs, Aufklapplisten und Hinweise.
+- Ohne Tray-Symbol beendet das Schließen des Fensters das Programm.
+
+Die offenen Punkte stehen in [DOKUMENTATION.md](DOKUMENTATION.md), Abschnitt 9.
+
+## Installation der Werkzeuge (Fedora/Nobara)
+
+Zum Holen des Quelltexts braucht man `git`, zum Bauen das .NET-10-Entwicklerpaket:
+
+```
+sudo dnf install git dotnet-sdk-10.0
+```
+
+Zum Entpacken (und damit die Tests dazu laufen) braucht man außerdem die Pakete `7zip`, `bsdtar` und `unar`. Für
+die Einstellung, Archive in den Papierkorb zu verschieben, wird `gio` aus `glib2` gebraucht:
+
+```
+sudo dnf install 7zip bsdtar unar glib2
+```
+
+## Bauen und Testen
+
+Im Projektordner (dort, wo diese Datei liegt):
+
+```
+dotnet build d6Downloader.sln
+dotnet test d6Downloader.sln
+```
+
+Die Oberflächen-Tests (`tests/D6Downloader.UiTests`) öffnen kein Fenster. Neue Bildschirmfotos entstehen mit
+`D6_SCREENSHOTS=$PWD/docs/screenshots dotnet test tests/D6Downloader.UiTests`.
+
+`dotnet build` übersetzt den Programmcode. `dotnet test` führt die automatischen Prüfungen aus. Beim ersten Mal lädt
+.NET die Testbibliotheken von nuget.org, dafür ist Internet nötig. Die Tests selbst sprechen nur mit dem eigenen
+Rechner (`127.0.0.1`) und arbeiten in vorübergehenden Ordnern.
+
+Ohne 7-Zip oder `unar` melden die zugehörigen Tests trotzdem „bestanden“, obwohl sie nichts geprüft haben. Die
+RAR-Testdateien stammen aus libarchive, siehe
+[tests/D6Downloader.Tests/Fixtures/rar/SOURCE.txt](tests/D6Downloader.Tests/Fixtures/rar/SOURCE.txt).
+
+### Fertige Programmdatei
+
+`tools/publish.sh` legt sie unter `dist/d6downloader-<Version>-linux-x64/` ab: eine Datei `d6downloader`, die ohne
+installiertes .NET läuft, daneben `Extension/`, `Licenses/`, `DOKUMENTATION.md`, `d6downloader.png`, `SHA256SUMS` und
+die Skripte `install.sh` und `uninstall.sh`. Installiert wird nach `~/.local/lib/d6downloader` mit der Verknüpfung
+`~/.local/bin/d6downloader`.
+
+Ohne Fenster: `d6downloader --version`, `d6downloader --add <url>`,
+`d6downloader --headless-download <url> --out <ordner>`.
+
+## Rapidgator
+
+Der Knopf **Rapidgator** steht oben im Fenster (auch in den Einstellungen unter „Konten“). Dort gibt man E-Mail und
+Passwort ein und sieht danach, wie lange Premium läuft und wie viel Traffic übrig ist. **Die Anbindung wurde nie mit
+dem echten Rapidgator ausprobiert**: Grundlage ist die Schnittstellenbeschreibung in
+[docs/rapidgator-api-v2.md](docs/rapidgator-api-v2.md) und eine nachgebaute Attrappe auf dem eigenen Rechner. Was die
+Beschreibung nicht sagt (abgelaufene Anmeldung, aufgebrauchter Traffic, Captcha), beruht auf Annahmen.
+
+Voraussetzung: ein **Premium-Konto** bei Rapidgator. Konten ohne Premium und Ordner-Links sind vorerst nicht vorgesehen.
+
+So verhält es sich:
+
+1. Im Programm einmal mit E-Mail und Passwort anmelden.
+2. Ist beim Konto die Zwei-Faktor-Anmeldung (2FA) eingeschaltet, fragt das Programm nach dem Code. Der Code wird nie
+   gespeichert.
+3. Man bleibt angemeldet, auch nach einem Neustart, bis man sich selbst abmeldet. Beim Abmelden werden Passwort und
+   Anmeldeschlüssel (Token) gelöscht.
+4. Rapidgator-Links werden dann wie andere Downloads geladen. Ist auch AllDebrid eingeschaltet, hat das eigene
+   Rapidgator-Konto Vorrang.
+
+Wird die Anmeldung abgelehnt (falsches Passwort, falscher Code, Captcha), versucht das Programm es nicht von selbst
+erneut, bis man sich neu anmeldet: Zu viele Fehlversuche führen bei Rapidgator zur Sperre der Internetadresse.
+
+Die eigentliche Datei wird zuerst verschlüsselt (HTTPS) angefragt. Klappt das nicht, wird die unverschlüsselte
+Adresse benutzt, die Rapidgator liefert; dann kann jemand im selben Netz den Download mitlesen. E-Mail, Passwort und
+Token gehen immer nur verschlüsselt über das Netz.
+
+Wo die Daten landen: Passwort und Token verschlüsselt (AES-256-GCM) in den eigenen Dateien des Programms unter
+`~/.config/d6downloader`, der Schlüssel dazu in einer getrennten Datei `master.key`, die nur das eigene Benutzerkonto
+lesen darf. KWallet wird nicht benutzt.
+
+**Grenze dieser Sicherheit:** Die Verschlüsselung verhindert, dass das Passwort lesbar in einer Datei steht. Sie schützt
+**nicht** vor Programmen, die unter dem eigenen Benutzerkonto laufen, vor Administratoren oder vor jemandem, der eine
+Kopie (zum Beispiel eine Sicherung) erhält, in der Einstellungen **und** Schlüsseldatei liegen. Wer beides hat, kann das
+Passwort entschlüsseln.
+
+Mit eingeschalteter 2FA kann sich das Programm nach Ablauf der Anmeldung nicht allein neu anmelden, dann wird wieder
+ein Code gebraucht. Die E-Mail-Adresse steht unverschlüsselt in den Einstellungen.
+
+## Hinweis
+
+d6Downloader ist ein unabhängiges Projekt und gehört nicht zu Rapidgator, AllDebrid, JDownloader oder Apple. Die Namen
+dienen nur dazu, die Verträglichkeit zu beschreiben. Nur für erlaubte Inhalte gedacht; für das, was man herunterlädt,
+ist man selbst verantwortlich.
+
+## Herkunft und Lizenz
+
+d6Downloader basiert auf [YDownloader](https://github.com/yusa1905/YDownloader) von **Yusa Özbay**. Vielen Dank dafür.
+Das Original und diese abgewandelte Fassung stehen unter der MIT-Lizenz, siehe [LICENSE](LICENSE) und
+[NOTICE.md](NOTICE.md).

@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.AfterSheet"
+             Width="480">
+    <StackPanel>
+        <TextBlock Classes="title" Text="{l:Str After.Title}"/>
+        <TextBlock Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap" Text="{l:Str After.Intro}"/>
+        <Grid ColumnDefinitions="110,*" RowDefinitions="Auto,Auto,Auto" Margin="0,14,0,0">
+            <TextBlock Classes="rowLabel" Text="{l:Str After.Then}"/>
+            <ComboBox x:Name="ActionBox" Grid.Column="1" Margin="0,0,0,6"/>
+            <TextBlock Classes="rowLabel" Grid.Row="1" Text="{l:Str After.When}"/>
+            <ComboBox x:Name="WhenBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,6"/>
+            <TextBlock x:Name="TargetLabel" Classes="rowLabel" Grid.Row="2" Text="{l:Str After.Download}"/>
+            <ComboBox x:Name="TargetBox" Grid.Row="2" Grid.Column="1" Margin="0,0,0,6"/>
+        </Grid>
+        <TextBlock x:Name="NoteText" Classes="secondary" TextWrapping="Wrap" IsVisible="False"/>
+        <TextBlock x:Name="ErrorText" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+        <StackPanel Classes="buttons">
+            <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+            <Button x:Name="ApplyButton" Content="{l:Str Common.Apply}" Classes="accent" IsDefault="True" IsEnabled="False"
+                    Click="Save_Click"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

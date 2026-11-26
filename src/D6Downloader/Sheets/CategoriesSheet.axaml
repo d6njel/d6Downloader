@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             xmlns:s="clr-namespace:D6Downloader.Sheets"
+             x:Class="D6Downloader.Sheets.CategoriesSheet"
+             Width="590">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
+        <TextBlock Classes="title" Text="{l:Str Categories.Title}"/>
+        <TextBlock Grid.Row="1" Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap" Text="{l:Str Categories.Intro}"/>
+        <Grid Grid.Row="2" ColumnDefinitions="130,8,*,8,*,68" Margin="0,14,0,0">
+            <TextBlock Classes="label" Text="{l:Str Categories.Name}"/>
+            <TextBlock Grid.Column="2" Classes="label" Text="{l:Str Categories.Extensions}"/>
+            <TextBlock Grid.Column="4" Classes="label" Text="{l:Str Categories.Folder}"/>
+        </Grid>
+        <ScrollViewer Grid.Row="3" MaxHeight="300">
+            <ItemsControl x:Name="Rows">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="s:CategoryRow">
+                        <Grid ColumnDefinitions="130,8,*,8,*,34,34" Margin="0,0,0,6">
+                            <TextBox Text="{Binding Name}" PlaceholderText="{l:Str Categories.NameHint}"/>
+                            <TextBox Grid.Column="2" Text="{Binding Extensions}" PlaceholderText="mkv mp4 …"/>
+                            <TextBox Grid.Column="4" Text="{Binding Folder}" PlaceholderText="{l:Str Categories.FolderHint}"/>
+                            <Button Grid.Column="5" Classes="icon" Content="{StaticResource IconFolder}"
+                                    ToolTip.Tip="{l:Str Categories.ChooseFolderTip}" Click="BrowseRow_Click"/>
+                            <Button Grid.Column="6" Classes="icon" Content="{StaticResource IconDelete}"
+                                    ToolTip.Tip="{l:Str Categories.DeleteTip}" Click="DeleteRow_Click"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Button Grid.Row="4" Content="{l:Str Categories.AddRow}" Margin="0,4,0,0" Click="AddRow_Click"/>
+        <TextBlock Grid.Row="5" x:Name="ErrorText" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+        <StackPanel Grid.Row="6" Classes="buttons">
+            <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+            <Button Content="{l:Str Common.Apply}" Classes="accent" IsDefault="True" Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

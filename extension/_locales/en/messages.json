@@ -1,12 +1,12 @@
 {
-  "extName": { "message": "YDownloader" },
-  "extDescription": { "message": "Send links from the browser to the YDownloader app (right-click)." },
-  "menuDownload": { "message": "Download with YDownloader" },
-  "actionTitle": { "message": "YDownloader: click to test the connection" },
-  "pingRunning": { "message": "Connected, YDownloader $1 is running", "placeholders": { "1": { "content": "$1" } } },
-  "pingIdle": { "message": "Connected, YDownloader $1 will start on the next link", "placeholders": { "1": { "content": "$1" } } },
-  "errNoHost": { "message": "YDownloader is not connected to this browser. Open YDownloader and use \"Connect browser…\" in the sidebar." },
+  "extName": { "message": "d6Downloader" },
+  "extDescription": { "message": "Send links from the browser to the d6Downloader app (right-click)." },
+  "menuDownload": { "message": "Download with d6Downloader" },
+  "actionTitle": { "message": "d6Downloader: click to test the connection" },
+  "pingRunning": { "message": "Connected, d6Downloader $1 is running", "placeholders": { "1": { "content": "$1" } } },
+  "pingIdle": { "message": "Connected, d6Downloader $1 will start on the next link", "placeholders": { "1": { "content": "$1" } } },
+  "errNoHost": { "message": "d6Downloader is not connected to this browser. Open d6Downloader and use \"Connect browser…\" in the settings." },
   "errNoLink": { "message": "No download link found here." },
-  "errUnreachable": { "message": "YDownloader did not start or did not answer." },
-  "errGeneric": { "message": "The link could not be handed to YDownloader." }
+  "errUnreachable": { "message": "d6Downloader did not start or did not answer." },
+  "errGeneric": { "message": "The link could not be handed to d6Downloader." }
 }

@@ -1,0 +1,203 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:D6Downloader.Controls">
+
+    <Style Selector="Window">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Background" Value="{DynamicResource WindowBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
+    </Style>
+
+    <!-- Texte -->
+    <Style Selector="TextBlock.secondary">
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+    </Style>
+    <Style Selector="TextBlock.tertiary">
+        <Setter Property="Foreground" Value="{DynamicResource TextTertiary}"/>
+    </Style>
+    <Style Selector="TextBlock.title">
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector="TextBlock.section">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+        <Setter Property="Margin" Value="0,14,0,6"/>
+    </Style>
+    <Style Selector="TextBlock.label">
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+        <Setter Property="Margin" Value="0,0,0,3"/>
+    </Style>
+    <Style Selector="TextBlock.rowLabel">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Margin" Value="0,0,10,6"/>
+    </Style>
+    <Style Selector="TextBlock.warning">
+        <Setter Property="Foreground" Value="{DynamicResource TextWarning}"/>
+    </Style>
+    <Style Selector="TextBlock.error">
+        <Setter Property="Foreground" Value="{DynamicResource TextError}"/>
+    </Style>
+    <Style Selector="TextBlock.success">
+        <Setter Property="Foreground" Value="{DynamicResource TextSuccess}"/>
+    </Style>
+    <Style Selector="TextBlock.icon">
+        <Setter Property="FontFamily" Value="{StaticResource FontIcons}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Knöpfe -->
+    <Style Selector="Button.icon">
+        <Setter Property="FontFamily" Value="{StaticResource FontIcons}"/>
+        <Setter Property="FontSize" Value="17"/>
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.icon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.small">
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="22"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+    <Style Selector="Button.link">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0,2"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="Foreground" Value="{DynamicResource Accent}"/>
+    </Style>
+    <Style Selector="StackPanel.buttons">
+        <Setter Property="Orientation" Value="Horizontal"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Spacing" Value="8"/>
+        <Setter Property="Margin" Value="0,16,0,0"/>
+    </Style>
+    <Style Selector="StackPanel.buttons > Button">
+        <Setter Property="MinWidth" Value="86"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+
+    <!-- Sheet -->
+    <Style Selector="Border.sheet">
+        <Setter Property="Background" Value="{DynamicResource SheetBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource SeparatorBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="20,16"/>
+        <Setter Property="BoxShadow" Value="0 8 30 0 #40000000"/>
+    </Style>
+    <Style Selector="Border.listBox">
+        <Setter Property="Background" Value="{DynamicResource InputBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+    </Style>
+
+    <!-- Listen: Download-Liste und Seitenleiste -->
+    <Style Selector="ListBox.rows">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="6"/>
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem">
+        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="Margin" Value="0,0,0,1"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource RowHover}"/>
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource RowSelected}"/>
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource RowSelected}"/>
+    </Style>
+    <Style Selector="ListBox.sidebar ListBoxItem">
+        <Setter Property="Padding" Value="6,4"/>
+    </Style>
+    <Style Selector="ListBox.sidebar ListBoxItem.header /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <!-- Zeilen der Download-Liste: Zustand als Klasse -->
+    <Style Selector="Border.badge">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackground}"/>
+        <Setter Property="CornerRadius" Value="5"/>
+        <Setter Property="Width" Value="32"/>
+    </Style>
+    <Style Selector="Border.badge > TextBlock">
+        <Setter Property="FontSize" Value="9.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource BadgeText}"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
+    </Style>
+    <Style Selector="c|SegmentBar">
+        <Setter Property="Height" Value="4"/>
+        <Setter Property="Fill" Value="{DynamicResource Accent}"/>
+        <Setter Property="Track" Value="{DynamicResource BarTrack}"/>
+    </Style>
+    <Style Selector="Panel.row.part">
+        <Setter Property="Margin" Value="36,0,0,0"/>
+    </Style>
+    <Style Selector="Panel.row.paused c|SegmentBar">
+        <Setter Property="Fill" Value="{DynamicResource BarPaused}"/>
+    </Style>
+    <Style Selector="Panel.row.queued c|SegmentBar">
+        <Setter Property="Fill" Value="{DynamicResource BarPaused}"/>
+    </Style>
+    <Style Selector="Panel.row.failed c|SegmentBar">
+        <Setter Property="Fill" Value="{DynamicResource Error}"/>
+    </Style>
+    <Style Selector="Panel.row.failed TextBlock.detail">
+        <Setter Property="Foreground" Value="{DynamicResource TextError}"/>
+    </Style>
+
+    <Style Selector="c|SegmentBar.done">
+        <Setter Property="Fill" Value="{DynamicResource Success}"/>
+    </Style>
+
+    <Style Selector="c|SpeedGraph">
+        <Setter Property="Stroke" Value="{DynamicResource Accent}"/>
+        <Setter Property="Fill" Value="{DynamicResource GraphFill}"/>
+    </Style>
+
+    <!-- Online-Punkt im Hinzufügen-Dialog -->
+    <Style Selector="Ellipse.dot">
+        <Setter Property="Width" Value="8"/>
+        <Setter Property="Height" Value="8"/>
+        <Setter Property="Fill" Value="{DynamicResource TextTertiary}"/>
+    </Style>
+    <Style Selector="Ellipse.dot.online">
+        <Setter Property="Fill" Value="{DynamicResource Success}"/>
+    </Style>
+    <Style Selector="Ellipse.dot.offline">
+        <Setter Property="Fill" Value="{DynamicResource Error}"/>
+    </Style>
+    <Style Selector="Ellipse.dot.warn">
+        <Setter Property="Fill" Value="{DynamicResource Warning}"/>
+    </Style>
+</Styles>

@@ -1,0 +1,128 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             xmlns:c="clr-namespace:D6Downloader.Controls"
+             xmlns:d="clr-namespace:D6Downloader.Downloads;assembly=D6Downloader.Core"
+             x:Class="D6Downloader.Sheets.DetailSheet"
+             x:DataType="d:DownloadDetail"
+             Width="590">
+    <UserControl.Styles>
+        <Style Selector="SelectableTextBlock.value">
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style Selector="TextBlock.name">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
+            <Setter Property="Margin" Value="0,2,8,6"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Styles>
+
+    <!-- Die Angaben scrollen: Kopfzeile und Knopf bleiben immer sichtbar. -->
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border BorderBrush="{DynamicResource SeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,0,0,10">
+            <StackPanel Spacing="4">
+                <TextBlock Classes="title" Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Classes="secondary" Classes.error="{Binding IsFailed}" Text="{Binding StatusText}" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="0,0,14,0">
+                <TextBlock Classes="section" Text="{l:Str Detail.Section.File}"/>
+                <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Classes="name" Text="{l:Str Detail.Link}"/>
+                    <SelectableTextBlock Grid.Column="1" Classes="value" Text="{Binding Url}"/>
+                    <TextBlock Grid.Row="1" Classes="name" Text="{l:Str Detail.FinalUrl}"/>
+                    <SelectableTextBlock Grid.Row="1" Grid.Column="1" Classes="value" Text="{Binding FinalUrlText}"/>
+                    <TextBlock Grid.Row="2" Classes="name" Text="{l:Str Detail.Server}"/>
+                    <SelectableTextBlock Grid.Row="2" Grid.Column="1" Classes="value" Text="{Binding ServerText}"/>
+                    <TextBlock Grid.Row="3" Classes="name" Text="{l:Str Detail.Target}"/>
+                    <SelectableTextBlock Grid.Row="3" Grid.Column="1" Classes="value" Text="{Binding TargetText}"/>
+                    <TextBlock Grid.Row="4" Classes="name" Text="{l:Str Detail.Size}"/>
+                    <SelectableTextBlock Grid.Row="4" Grid.Column="1" Classes="value" Text="{Binding SizeText}"/>
+                    <TextBlock Grid.Row="5" Classes="name" Text="{l:Str Detail.Resume}"/>
+                    <SelectableTextBlock Grid.Row="5" Grid.Column="1" Classes="value" Text="{Binding ResumeText}"/>
+                </Grid>
+
+                <!-- Live: jede Verbindung einzeln -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="section" Text="{l:Str Detail.Section.Connections}"/>
+                    <TextBlock Grid.Column="1" Classes="secondary" Text="{Binding LiveText}" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Connections}" IsVisible="{Binding HasConnections}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="d:ConnectionInfo">
+                            <Grid ColumnDefinitions="22,128,*,40,82,100" Margin="0,0,0,4">
+                                <TextBlock Classes="secondary" Text="{Binding Name}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding RangeText}" ToolTip.Tip="{Binding RangeTip}"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <c:SegmentBar Grid.Column="2" Classes.done="{Binding IsDone}" VerticalAlignment="Center" Margin="0,0,8,0"
+                                              Fraction="{Binding Fraction}" ToolTip.Tip="{Binding DoneText}"/>
+                                <TextBlock Grid.Column="3" Classes="secondary" Text="{Binding PercentText}" HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding SpeedText}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                <c:SpeedGraph Grid.Column="5" Height="20" Margin="8,0,0,0" History="{Binding History}" Step="1"
+                                              ToolTip.Tip="{l:Str Detail.ConnGraphTip}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ItemsControl ItemsSource="{Binding Summaries}" IsVisible="{Binding HasSummary}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="d:ConnectionSummary">
+                            <Grid ColumnDefinitions="22,128,*,Auto" Margin="0,0,0,4">
+                                <TextBlock Classes="secondary" Text="{Binding Name}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding RangeText}" ToolTip.Tip="{Binding RangeTip}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="2" Classes="secondary" Text="{Binding DoneText}"/>
+                                <TextBlock Grid.Column="3" Text="{Binding SpeedText}" ToolTip.Tip="{l:Str Detail.AvgSpeedTip}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Classes="secondary" Text="{Binding ConnectionsHint}" IsVisible="{Binding ShowHint}"/>
+
+                <TextBlock Classes="section" Text="{l:Str Detail.Section.History}"/>
+                <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Classes="name" Text="{l:Str Detail.Start}"/>
+                    <SelectableTextBlock Grid.Column="1" Classes="value" Text="{Binding StartText}"/>
+                    <TextBlock Grid.Row="1" Classes="name" Text="{l:Str Detail.End}"/>
+                    <SelectableTextBlock Grid.Row="1" Grid.Column="1" Classes="value" Text="{Binding EndText}"/>
+                    <TextBlock Grid.Row="2" Classes="name" Text="{l:Str Detail.Duration}"/>
+                    <SelectableTextBlock Grid.Row="2" Grid.Column="1" Classes="value" Text="{Binding DurationText}"
+                                         ToolTip.Tip="{l:Str Detail.DurationTip}"/>
+                    <TextBlock Grid.Row="3" Classes="name" Text="{l:Str Detail.Average}"/>
+                    <SelectableTextBlock Grid.Row="3" Grid.Column="1" Classes="value" Text="{Binding AverageText}"
+                                         ToolTip.Tip="{l:Str Detail.AverageTip}"/>
+                    <TextBlock Grid.Row="4" Classes="name" Text="{l:Str Detail.Retries}"/>
+                    <SelectableTextBlock Grid.Row="4" Grid.Column="1" Classes="value" Text="{Binding RetriesText}"/>
+                    <TextBlock Grid.Row="5" Classes="name" Text="{l:Str Detail.Checksum}"/>
+                    <StackPanel Grid.Row="5" Grid.Column="1">
+                        <TextBlock Text="{Binding ChecksumResultText}" Classes.error="{Binding ChecksumFailed}" TextWrapping="Wrap"/>
+                        <SelectableTextBlock Classes="value" FontSize="11" Text="{Binding ChecksumValueText}"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Classes="section" Text="{l:Str Detail.Section.Log}"/>
+                <ItemsControl ItemsSource="{Binding Log}" IsVisible="{Binding HasLog}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="d:HistoryEntry">
+                            <Grid ColumnDefinitions="130,*" Margin="0,0,0,4">
+                                <TextBlock Classes="secondary" Text="{Binding TimeText}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Text}" Classes.error="{Binding Fatal}" TextWrapping="Wrap"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Classes="secondary" Text="{l:Str Detail.LogEmpty}" IsVisible="{Binding !HasLog}"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Classes="buttons">
+            <Button x:Name="CloseButton" Content="{l:Str Common.Close}" Classes="accent" IsDefault="True" IsCancel="True"
+                    Click="Close_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

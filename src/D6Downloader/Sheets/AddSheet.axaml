@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             xmlns:s="clr-namespace:D6Downloader.Sheets;assembly=D6Downloader.Core"
+             x:Class="D6Downloader.Sheets.AddSheet"
+             Width="590">
+    <!-- Die Liste schrumpft, wenn das Fenster niedrig ist: Knöpfe bleiben immer sichtbar. -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto">
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Classes="icon" Content="{StaticResource IconPaste}"
+                    ToolTip.Tip="{l:Str Add.PasteTip}" Click="Paste_Click"/>
+            <TextBlock Classes="title" Text="{l:Str Add.Title}" VerticalAlignment="Center"/>
+        </DockPanel>
+
+        <TextBox x:Name="LinksBox" Grid.Row="1" Margin="0,6,0,0" Height="58" AcceptsReturn="True" TextWrapping="NoWrap"
+                 VerticalContentAlignment="Top" PlaceholderText="{l:Str Add.LinksHint}" TextChanged="LinksBox_TextChanged"/>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+            <TextBox x:Name="FilterBox" PlaceholderText="{l:Str Add.FilterHint}" TextChanged="FilterBox_TextChanged"
+                     ToolTip.Tip="{l:Str Add.FilterTip}"/>
+            <TextBlock x:Name="CountText" Grid.Column="1" Classes="secondary" VerticalAlignment="Center" Margin="12,0,0,0"/>
+        </Grid>
+
+        <Border Grid.Row="3" Classes="listBox" Margin="0,6,0,0" MinHeight="76" MaxHeight="320">
+            <Grid RowDefinitions="Auto,*">
+                <Border BorderBrush="{DynamicResource SeparatorBrush}" BorderThickness="0,0,0,1" Padding="14,2">
+                    <CheckBox x:Name="AllBox" Content="{l:Str Common.All}" IsThreeState="False" Click="AllBox_Click"/>
+                </Border>
+                <ListBox x:Name="Candidates" Grid.Row="1" Classes="rows" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.DataTemplates>
+                        <!-- Kopfzeile eines Pakets: Name und Ordner änderbar, das Häkchen wählt alle Teile -->
+                        <DataTemplate DataType="s:PackageHeader">
+                            <Grid ColumnDefinitions="Auto,28,8,*">
+                                <CheckBox IsChecked="{Binding IsChecked}" IsThreeState="True" VerticalAlignment="Top" MinWidth="26"/>
+                                <Border Grid.Column="1" Classes="badge" Width="26" Height="30" VerticalAlignment="Top"
+                                        Background="{DynamicResource AccentSoft}">
+                                    <TextBlock Text="{Binding Badge}"/>
+                                </Border>
+                                <StackPanel Grid.Column="3" Spacing="3">
+                                    <Grid ColumnDefinitions="*,8,*">
+                                        <TextBox Text="{Binding Name}" PlaceholderText="{l:Str Package.NameHint}"
+                                                 ToolTip.Tip="{l:Str Package.NameTip}"/>
+                                        <TextBox Grid.Column="2" Text="{Binding FolderText}" ToolTip.Tip="{l:Str Package.FolderTip}"/>
+                                    </Grid>
+                                    <TextBlock Classes="secondary" TextWrapping="Wrap" Text="{Binding Summary}"
+                                               Classes.warning="{Binding Tone, Converter={x:Static l:Conv.IsWarning}}"
+                                               Classes.error="{Binding Tone, Converter={x:Static l:Conv.IsError}}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+
+                        <DataTemplate DataType="s:AddCandidate">
+                            <Panel Classes="row" Classes.part="{Binding InPackage}">
+                                <Grid ColumnDefinitions="Auto,28,8,*,Auto,Auto" Background="Transparent">
+                                    <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center" MinWidth="26"/>
+                                    <Border Grid.Column="1" Classes="badge" Width="26" Height="30">
+                                        <TextBlock Text="{Binding Badge}"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Classes="secondary" Text="{Binding StatusText}" TextTrimming="CharacterEllipsis"
+                                                   ToolTip.Tip="{Binding StatusText}"
+                                                   Classes.warning="{Binding Tone, Converter={x:Static l:Conv.IsWarning}}"
+                                                   Classes.error="{Binding Tone, Converter={x:Static l:Conv.IsError}}"/>
+                                    </StackPanel>
+                                    <!-- Online-Check: grün online, rot offline, gelb Passwort oder kein Zugriff, grau wird geprüft -->
+                                    <Ellipse Grid.Column="4" Classes="dot" Margin="8,0,0,0" VerticalAlignment="Center"
+                                             IsVisible="{Binding Check, Converter={x:Static l:Conv.CheckShown}}"
+                                             Classes.online="{Binding Check, Converter={x:Static l:Conv.CheckOnline}}"
+                                             Classes.offline="{Binding Check, Converter={x:Static l:Conv.CheckOffline}}"
+                                             Classes.warn="{Binding Check, Converter={x:Static l:Conv.CheckWarn}}"/>
+                                    <TextBlock Grid.Column="5" Classes="secondary" Text="{Binding SizeText}" Margin="8,0,0,0"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Panel>
+                        </DataTemplate>
+                    </ListBox.DataTemplates>
+                </ListBox>
+                <TextBlock x:Name="EmptyText" Grid.Row="1" Classes="secondary tertiary" Text="{l:Str Add.Empty}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="4" ColumnDefinitions="*,12,190" Margin="0,10,0,0">
+            <TextBlock Classes="label" Text="{l:Str Add.SaveIn}"/>
+            <TextBlock Grid.Column="2" Classes="label" Text="{l:Str Common.Category}"/>
+        </Grid>
+        <Grid Grid.Row="5" ColumnDefinitions="*,Auto,12,190">
+            <TextBox x:Name="FolderBox" TextChanged="FolderBox_TextChanged"/>
+            <Button Grid.Column="1" Content="{l:Str Common.BrowseFolder}" Margin="8,0,0,0" Click="Browse_Click"/>
+            <ComboBox Grid.Column="3" x:Name="CategoryBox"/>
+        </Grid>
+
+        <StackPanel Grid.Row="6" Margin="0,6,0,0" Spacing="4">
+            <TextBlock x:Name="SummaryText" Classes="secondary" TextWrapping="Wrap"/>
+            <TextBlock x:Name="DebridHint" Classes="secondary warning" TextWrapping="Wrap" IsVisible="False"/>
+        </StackPanel>
+
+        <Grid Grid.Row="7" ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Spacing="14">
+                <CheckBox x:Name="StartBox" Content="{l:Str Add.StartNow}" VerticalAlignment="Center"/>
+                <!-- Nur sichtbar, wenn es eigene Queues gibt -->
+                <StackPanel x:Name="QueuePanel" Orientation="Horizontal" Spacing="8" IsVisible="False">
+                    <TextBlock Classes="secondary" Text="{l:Str Common.Queue}" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="QueueBox" Width="130"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Classes="buttons" Margin="0">
+                <Button Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+                <Button x:Name="AddButton" Classes="accent" Content="{l:Str Common.Add}" IsDefault="True" Click="Add_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

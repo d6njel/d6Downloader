@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.BrowserSheet"
+             Width="590">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
+        <TextBlock Classes="title" Text="{l:Str Browser.Title}"/>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="0,0,14,0">
+                <TextBlock Classes="secondary" Text="{l:Str Browser.Intro}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+                <TextBlock Classes="section" Text="{l:Str Browser.Step1}"/>
+                <Grid ColumnDefinitions="150,*,Auto" RowDefinitions="Auto,Auto">
+                    <TextBlock Classes="rowLabel" Text="Chrome / Chromium"/>
+                    <TextBlock x:Name="ChromeState" Classes="rowLabel" Grid.Column="1"/>
+                    <Button x:Name="ChromeButton" Grid.Column="2" Margin="0,0,0,6" Click="Chrome_Click"/>
+                    <TextBlock Classes="rowLabel" Grid.Row="1" Text="Firefox"/>
+                    <TextBlock x:Name="FirefoxState" Classes="rowLabel" Grid.Row="1" Grid.Column="1"/>
+                    <Button x:Name="FirefoxButton" Grid.Row="1" Grid.Column="2" Margin="0,0,0,6" Click="Firefox_Click"/>
+                </Grid>
+                <TextBlock Classes="secondary" Text="{l:Str Browser.Step1Hint}" TextWrapping="Wrap"/>
+                <TextBlock Classes="secondary" Text="{l:Str Browser.Sandbox}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+                <TextBlock Classes="section" Text="{l:Str Browser.Step2}"/>
+                <SelectableTextBlock x:Name="FolderText" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                    <Button Content="{l:Str Browser.OpenFolder}" Click="OpenFolder_Click"/>
+                    <Button Content="{l:Str Browser.CopyPath}" Click="CopyPath_Click"/>
+                </StackPanel>
+                <TextBlock Classes="secondary" Text="{l:Str Browser.HowChrome}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                <TextBlock Classes="secondary" Text="{l:Str Browser.HowFirefox}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+                <TextBlock Classes="section" Text="{l:Str Browser.Step3}"/>
+                <TextBlock Classes="secondary" Text="{l:Str Browser.Step3Text}" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+        <TextBlock x:Name="ErrorText" Grid.Row="2" Classes="secondary error" Margin="0,8,0,0" TextWrapping="Wrap" IsVisible="False"/>
+        <StackPanel Grid.Row="3" Classes="buttons">
+            <Button x:Name="CloseButton" Content="{l:Str Common.Close}" Classes="accent" IsDefault="True" IsCancel="True"
+                    Click="Close_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

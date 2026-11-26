@@ -1,0 +1,242 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:D6Downloader"
+        xmlns:c="clr-namespace:D6Downloader.Controls"
+        xmlns:d="clr-namespace:D6Downloader.Downloads;assembly=D6Downloader.Core"
+        x:Class="D6Downloader.MainWindow"
+        x:DataType="d:DownloadManager"
+        Title="d6Downloader" Width="960" Height="600" MinWidth="700" MinHeight="480"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://d6downloader/Assets/icon.png">
+
+    <LayoutTransformControl x:Name="Scaler">
+        <Grid RowDefinitions="Auto,*">
+            <!-- Werkzeugleiste -->
+            <Border x:Name="Toolbar" Background="{DynamicResource BarBackground}" Padding="8,5"
+                    BorderBrush="{DynamicResource SeparatorBrush}" BorderThickness="0,0,0,1">
+                <DockPanel LastChildFill="False">
+                    <Button x:Name="AddLinksButton" Click="Add_Click" ToolTip.Tip="{l:Str Main.Tool.Add}" Classes="icon"
+                            Content="{StaticResource IconAdd}"/>
+                    <Button Classes="icon" Content="{StaticResource IconPlay}" Margin="12,0,0,0"
+                            ToolTip.Tip="{l:Str Main.Tool.StartAll}" Click="StartAll_Click"/>
+                    <Button Classes="icon" Content="{StaticResource IconPause}"
+                            ToolTip.Tip="{l:Str Main.Tool.PauseAll}" Click="PauseAll_Click"/>
+                    <Button Classes="icon" Content="{StaticResource IconClear}" Margin="12,0,0,0"
+                            ToolTip.Tip="{l:Str Main.Tool.RemoveCompleted}" Click="RemoveCompleted_Click"/>
+
+                    <Button DockPanel.Dock="Right" Classes="icon" Content="{StaticResource IconSettings}" Margin="8,0,0,0"
+                            x:Name="SettingsButton" ToolTip.Tip="{l:Str Main.Tool.Settings}" Click="Settings_Click"/>
+                    <Button DockPanel.Dock="Right" Classes="icon" Content="{StaticResource IconPower}" Margin="8,0,0,0"
+                            ToolTip.Tip="{l:Str Main.Tool.After}" Click="After_Click"/>
+                    <!-- Das Rapidgator-Konto steht mit Namen in der Leiste, damit man es findet. -->
+                    <Button DockPanel.Dock="Right" x:Name="RapidgatorButton" Height="28" MinHeight="0" Padding="9,0"
+                            VerticalContentAlignment="Center" ToolTip.Tip="{l:Str Rapidgator.ToolTip}" Click="Rapidgator_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Classes="icon" Text="{StaticResource IconKey}" FontSize="14"/>
+                            <TextBlock Text="{l:Str Rapidgator.Title}" VerticalAlignment="Center"/>
+                            <Ellipse x:Name="RapidgatorDot" Classes="dot" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </DockPanel>
+            </Border>
+
+            <Grid Grid.Row="1">
+                <Grid x:Name="Main" RowDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="200,*">
+                        <!-- Seitenleiste: Ansichten nach Zustand, Queue und Kategorie -->
+                        <Border Background="{DynamicResource SidebarBackground}" BorderBrush="{DynamicResource SeparatorBrush}"
+                                BorderThickness="0,0,1,0">
+                            <ListBox x:Name="SidebarList" Classes="rows sidebar" SelectionMode="Single"
+                                     SelectionChanged="Sidebar_SelectionChanged">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="d:SidebarEntry">
+                                        <Grid ColumnDefinitions="24,*,Auto" Background="Transparent" MinHeight="20">
+                                            <TextBlock Classes="icon" IsVisible="{Binding !IsHeader}" HorizontalAlignment="Left"
+                                                       Foreground="{DynamicResource Accent}" FontSize="15"
+                                                       Text="{Binding IconKey, Converter={x:Static l:Conv.Resource}}"/>
+                                            <TextBlock Grid.Column="1" IsVisible="{Binding !IsHeader}" Text="{Binding Title}"
+                                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.ColumnSpan="2" IsVisible="{Binding IsHeader}" Text="{Binding Title}"
+                                                       Classes="section" Margin="0,10,0,0" VerticalAlignment="Bottom"/>
+                                            <TextBlock Grid.Column="2" Classes="secondary" Text="{Binding CountText}"
+                                                       VerticalAlignment="Center"/>
+                                            <Button Grid.Column="2" Classes="icon small" IsVisible="{Binding HasEdit}"
+                                                    Content="{StaticResource IconEdit}" VerticalAlignment="Bottom"
+                                                    ToolTip.Tip="{Binding EditTip}" Click="SidebarEdit_Click"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+
+                        <!-- Liste -->
+                        <Grid Grid.Column="1">
+                            <ListBox x:Name="List" Classes="rows" SelectionMode="Multiple"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ContextMenu>
+                                    <ContextMenu x:Name="RowMenu" Opening="RowMenu_Opening" Closed="RowMenu_Closed">
+                                        <MenuItem x:Name="MenuStart" Header="{l:Str Action.Start}" Click="MenuStart_Click"/>
+                                        <MenuItem x:Name="MenuPause" Header="{l:Str Action.Pause}" Click="MenuPause_Click"/>
+                                        <Separator x:Name="StartSeparator"/>
+                                        <MenuItem x:Name="MenuOpen" Header="{l:Str Menu.OpenFile}" InputGesture="Enter" Click="MenuOpen_Click"/>
+                                        <MenuItem x:Name="MenuShow" Header="{l:Str Action.ShowInFolder}" Click="MenuShow_Click"/>
+                                        <MenuItem x:Name="MenuCopy" Header="{l:Str Menu.CopyLink}" InputGesture="Ctrl+C" Click="MenuCopy_Click"/>
+                                        <MenuItem x:Name="MenuExport" Header="{l:Str Menu.ExportLinks}" Click="MenuExport_Click"/>
+                                        <MenuItem x:Name="MenuExtract" Header="{l:Str Menu.Extract}" Click="MenuExtract_Click"/>
+                                        <MenuItem x:Name="MenuPassword" Header="{l:Str Menu.EnterPassword}" Click="MenuPassword_Click"/>
+                                        <Separator/>
+                                        <MenuItem x:Name="MenuDetails" Header="{l:Str Menu.Details}" InputGesture="Ctrl+I" Click="MenuDetails_Click"/>
+                                        <MenuItem x:Name="MenuEdit" Header="{l:Str Menu.Edit}" InputGesture="F2" Click="MenuEdit_Click"/>
+                                        <MenuItem x:Name="MenuCategory" Header="{l:Str Menu.Category}"/>
+                                        <MenuItem x:Name="MenuQueue" Header="{l:Str Menu.Queue}"/>
+                                        <MenuItem x:Name="MenuAfter" Header="{l:Str Menu.After}" Click="MenuAfter_Click"
+                                                  ToolTip.Tip="{l:Str Menu.AfterTip}"/>
+                                        <Separator/>
+                                        <MenuItem x:Name="MenuRemove" Header="{l:Str Menu.Remove}" InputGesture="Delete" Click="MenuRemove_Click"/>
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                                <ListBox.DataTemplates>
+                                    <!-- Eine Zeile: ein Download. Fertige stehen kompakt da. -->
+                                    <DataTemplate DataType="d:DownloadItem">
+                                        <Panel Classes="row" Background="Transparent"
+                                               Classes.part="{Binding IsPackagePart}"
+                                               Classes.paused="{Binding Status, Converter={x:Static l:Conv.IsPaused}}"
+                                               Classes.queued="{Binding Status, Converter={x:Static l:Conv.IsQueued}}"
+                                               Classes.failed="{Binding Status, Converter={x:Static l:Conv.IsFailed}}">
+                                            <Grid IsVisible="{Binding Status, Converter={x:Static l:Conv.IsCompleted}}"
+                                                  ColumnDefinitions="32,12,*,Auto,Auto,Auto,Auto">
+                                                <Border Classes="badge" Height="24">
+                                                    <TextBlock Text="{Binding Badge}"/>
+                                                </Border>
+                                                <DockPanel Grid.Column="2" VerticalAlignment="Center">
+                                                    <TextBlock DockPanel.Dock="Right" Classes="secondary" Text="{Binding PackageTag}"
+                                                               IsVisible="{Binding !IsPackagePart}" MaxWidth="160" Margin="10,0,0,0"
+                                                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
+                                                               ToolTip.Tip="{Binding FileName}"/>
+                                                </DockPanel>
+                                                <TextBlock Grid.Column="3" Classes="secondary" Text="{Binding SizeText}" Margin="10,0,0,0"
+                                                           MinWidth="60" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="4" Classes="secondary" Text="{Binding DoneTimeText}" Margin="10,0,0,0"
+                                                           MinWidth="90" TextAlignment="Right" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="5" Classes="secondary" Classes.warning="{Binding StateIsProblem}"
+                                                           Text="{Binding StateText}" ToolTip.Tip="{Binding StateText}" Margin="10,0,0,0"
+                                                           MaxWidth="170" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                                <Button Grid.Column="6" Classes="icon small" Margin="8,0,0,0" Content="{StaticResource IconFolder}"
+                                                        ToolTip.Tip="{l:Str Action.ShowInFolder}" Click="RowAction_Click"/>
+                                            </Grid>
+
+                                            <Grid IsVisible="{Binding Status, Converter={x:Static l:Conv.IsNotCompleted}}"
+                                                  ColumnDefinitions="32,12,*,12,104,Auto">
+                                                <Border Classes="badge" Height="38">
+                                                    <TextBlock Text="{Binding Badge}"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"
+                                                               ToolTip.Tip="{Binding FileName}"/>
+                                                    <c:SegmentBar Margin="0,5" Opacity="1" IsVisible="{Binding !BarHidden}"
+                                                                  Progress="{Binding Progress}" Fraction="{Binding Fraction}"/>
+                                                    <TextBlock Classes="secondary detail" Text="{Binding DetailText}"
+                                                               TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding DetailText}"/>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="4" VerticalAlignment="Center" Spacing="2">
+                                                    <TextBlock Text="{Binding SpeedText}" HorizontalAlignment="Right"/>
+                                                    <TextBlock Classes="secondary" Text="{Binding EtaText}" HorizontalAlignment="Right"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="5" Classes="icon small" Margin="8,0,0,0"
+                                                        Content="{Binding Status, Converter={x:Static l:Conv.ActionIcon}}"
+                                                        ToolTip.Tip="{Binding Status, Converter={x:Static l:Conv.ActionTip}}"
+                                                        Click="RowAction_Click"/>
+                                            </Grid>
+                                        </Panel>
+                                    </DataTemplate>
+
+                                    <!-- Kopfzeile eines Pakets: fasst die Teile zusammen. -->
+                                    <DataTemplate DataType="d:PackageHead">
+                                        <Panel Classes="row" Background="Transparent"
+                                               Classes.paused="{Binding Status, Converter={x:Static l:Conv.IsPaused}}"
+                                               Classes.queued="{Binding Status, Converter={x:Static l:Conv.IsQueued}}"
+                                               Classes.failed="{Binding Status, Converter={x:Static l:Conv.IsFailed}}">
+                                            <Grid ColumnDefinitions="26,32,12,*,12,Auto,Auto">
+                                                <Button Classes="icon small" HorizontalAlignment="Left"
+                                                        Content="{Binding IsExpanded, Converter={x:Static l:Conv.Chevron}}"
+                                                        Click="HeadToggle_Click"/>
+                                                <Border Grid.Column="1" Classes="badge" Height="38">
+                                                    <TextBlock Text="{Binding Badge}"/>
+                                                </Border>
+                                                <StackPanel Grid.Column="3" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+                                                               ToolTip.Tip="{Binding Name}"/>
+                                                    <c:SegmentBar Margin="0,5" IsVisible="{Binding !BarHidden}" Fraction="{Binding Fraction}"/>
+                                                    <DockPanel>
+                                                        <TextBlock Classes="secondary" Text="{Binding DetailText}"/>
+                                                        <TextBlock Classes="secondary"
+                                                                   Classes.warning="{Binding Tone, Converter={x:Static l:Conv.IsWarningTone}}"
+                                                                   Classes.error="{Binding Tone, Converter={x:Static l:Conv.IsErrorTone}}"
+                                                                   Text="{Binding StateText, Converter={x:Static l:Conv.Dotted}}"
+                                                                   ToolTip.Tip="{Binding StateText}" TextTrimming="CharacterEllipsis"/>
+                                                    </DockPanel>
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="5" VerticalAlignment="Center" Spacing="2" MinWidth="104">
+                                                    <TextBlock Text="{Binding SpeedText}" HorizontalAlignment="Right"/>
+                                                    <TextBlock Classes="secondary" Text="{Binding EtaText}" HorizontalAlignment="Right"/>
+                                                </StackPanel>
+                                                <Button Grid.Column="6" Classes="icon small" Margin="8,0,0,0"
+                                                        Content="{Binding Status, Converter={x:Static l:Conv.ActionIcon}}"
+                                                        ToolTip.Tip="{Binding Status, Converter={x:Static l:Conv.ActionTip}}"
+                                                        Click="HeadAction_Click"/>
+                                            </Grid>
+                                        </Panel>
+                                    </DataTemplate>
+                                </ListBox.DataTemplates>
+                            </ListBox>
+
+                            <StackPanel x:Name="EmptyState" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        IsHitTestVisible="False" Spacing="8">
+                                <TextBlock Classes="icon tertiary" Text="{StaticResource IconDownload}" FontSize="42"/>
+                                <TextBlock x:Name="EmptyTitle" Text="{l:Str Main.Empty.Title}" HorizontalAlignment="Center"
+                                           Foreground="{DynamicResource TextSecondary}"/>
+                                <TextBlock x:Name="EmptyHint" Classes="secondary tertiary" Text="{l:Str Main.Empty.Hint}"
+                                           HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Border x:Name="DropHint" Margin="8" Background="{DynamicResource AccentSoft}" IsVisible="False"
+                                    BorderBrush="{DynamicResource Accent}" BorderThickness="2" CornerRadius="10"
+                                    IsHitTestVisible="False">
+                                <TextBlock Classes="title" Text="{l:Str Main.DropHint}" Foreground="{DynamicResource Accent}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+                    <!-- Statusleiste -->
+                    <Border Grid.Row="1" Background="{DynamicResource BarBackground}" Padding="12,0" Height="28"
+                            BorderBrush="{DynamicResource SeparatorBrush}" BorderThickness="0,1,0,0">
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+                            <TextBlock Classes="secondary" Text="{Binding Stats.FreeSpaceText}" VerticalAlignment="Center"
+                                       HorizontalAlignment="Left" ToolTip.Tip="{l:Str Main.Status.FreeTip}"/>
+                            <Button Grid.Column="1" Classes="link" Content="{Binding AfterCompletion.StatusText}" FontSize="11.5"
+                                    IsVisible="{Binding AfterCompletion.IsArmed}" VerticalAlignment="Center" Margin="0,0,8,0"
+                                    ToolTip.Tip="{l:Str Main.Status.AfterTip}" Click="After_Click"/>
+                            <TextBlock Grid.Column="2" Classes="secondary" Text="{Binding Stats.EtaText}" Width="100"
+                                       TextAlignment="Right" VerticalAlignment="Center" ToolTip.Tip="{l:Str Main.Status.EtaTip}"/>
+                            <c:SpeedGraph Grid.Column="3" Width="160" Height="16" Margin="8,0" VerticalAlignment="Center"
+                                          History="{Binding Stats.History}" Baseline="{DynamicResource BarTrack}"
+                                          ToolTip.Tip="{l:Str Main.Status.GraphTip}"/>
+                            <TextBlock Grid.Column="4" Classes="secondary" Text="{Binding Stats.SpeedText}" Width="80"
+                                       TextAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- Sheet: modal unter der Werkzeugleiste -->
+                <Grid x:Name="SheetLayer" IsVisible="False" KeyboardNavigation.TabNavigation="Cycle">
+                    <Border Background="{DynamicResource Backdrop}"/>
+                    <Border x:Name="SheetFrame" Classes="sheet" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="16,10,16,14">
+                        <ContentControl x:Name="SheetHost" Focusable="True"/>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </LayoutTransformControl>
+</Window>

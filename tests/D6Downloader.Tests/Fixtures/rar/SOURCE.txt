@@ -1,0 +1,8 @@
+Die .rar.uu-Dateien in diesem Ordner sind unveraenderte Testdaten aus libarchive.
+
+Quelle:  https://github.com/libarchive/libarchive, Ordner libarchive/test/
+Commit:  b4a3fb1a8bfc6812e465d9a2213ca07d8769ba4a (geladen am 2026-11-26)
+Lizenz:  New BSD (2-Klausel) und weitere, siehe die mitgelieferte Datei COPYING
+
+Die Dateien sind fremde Daten und werden nur von den Tests gelesen (dort dekodiert und in
+einem Ordner unter /tmp entpackt). Sie werden nicht mit dem Programm ausgeliefert.

@@ -1,11 +1,11 @@
-// YDownloader: Rechtsklick auf Link, Bild, Video, Audio oder markierten Text schickt den Link an die App.
+// d6Downloader: Rechtsklick auf Link, Bild, Video, Audio oder markierten Text schickt den Link an die App.
 // Läuft in Chrome (Service Worker) und Firefox (Event-Seite). Kein Inhaltsskript, keine Seitenrechte:
-// nur das Kontextmenü und der Native-Messaging-Host "ydownloader.host".
+// nur das Kontextmenü und der Native-Messaging-Host "d6downloader.host".
 "use strict";
 
 const api = globalThis.browser ?? globalThis.chrome;
-const HOST = "ydownloader.host";
-const MENU_ID = "ydownloader-download";
+const HOST = "d6downloader.host";
+const MENU_ID = "d6downloader-download";
 const BADGE_MS = 4000;
 
 const text = (key, ...subs) => api.i18n.getMessage(key, subs) || key;

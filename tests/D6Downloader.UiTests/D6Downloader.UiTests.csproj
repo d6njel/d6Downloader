@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Oberflächen-Tests ohne Bildschirm (Avalonia Headless). Eigenes Projekt, weil sie xunit v3 brauchen. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <AvaloniaVersion>12.2.0</AvaloniaVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.HarfBuzz" Version="$(AvaloniaVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\D6Downloader\D6Downloader.csproj" />
+    <ProjectReference Include="..\..\src\D6Downloader.Core\D6Downloader.Core.csproj" />
+    <ProjectReference Include="..\..\src\D6Downloader.Platform.Linux\D6Downloader.Platform.Linux.csproj" />
+  </ItemGroup>
+
+  <!-- Dieselbe Vorbereitung (eigenes HOME, Schlüssel nur im Speicher, deutsche Texte) und dieselben Attrappen. -->
+  <ItemGroup>
+    <Compile Include="..\D6Downloader.Tests\TestSetup.cs" Link="Shared\TestSetup.cs" />
+    <Compile Include="..\D6Downloader.Tests\TestServer.cs" Link="Shared\TestServer.cs" />
+    <Compile Include="..\D6Downloader.Tests\FakeRapidgator.cs" Link="Shared\FakeRapidgator.cs" />
+  </ItemGroup>
+
+</Project>

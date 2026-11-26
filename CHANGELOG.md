@@ -1,5 +1,61 @@
 # Changelog
 
+## d6Downloader 0.1.0 (in Arbeit, noch nicht veröffentlicht)
+
+Vorabfassung, siehe [README](README.md) und [DOKUMENTATION](DOKUMENTATION.md).
+
+### Neu
+
+- Einstellung „Archive nach dem Entpacken in den Papierkorb verschieben“ (ab Werk aus): nur nach vollständig geglücktem Entpacken, alle Teile des Archivs, nie endgültiges Löschen.
+- Ein ZIP-Eintrag, der kürzer ist als angegeben, gilt jetzt als beschädigtes Archiv.
+- Click'n'Load funktioniert mit mehr Webseiten: `/jdcheck.js` und `/crossdomain.xml` werden beantwortet, Links auch per GET, als `multipart/form-data` und über `/flash/addcnl` angenommen, und es wird zusätzlich auf `::1` gelauscht. Noch nicht mit einer echten Webseite ausprobiert.
+- RAR wird mit `unar`/`lsar` entpackt, auch mehrteilig. Vor dem Entpacken werden Namen, Verknüpfungen, Vollständigkeit und Platz geprüft.
+- Neuer Zustand „RAR: unar nötig“, wenn kein passendes Programm da ist.
+- Einstellung „Passwort an unar übergeben“ (ab Werk aus): ohne sie bleiben geschützte RAR ungeöffnet, mit ihr ist das Passwort während des Entpackens in der Prozessliste sichtbar.
+- Hinweis zum Zurückwechseln: Ältere Fassungen können eine Download-Liste mit den neuen Zuständen nicht lesen (sie wird als `.bad` beiseitegelegt).
+- Noch ungeprüft: verschlüsseltes RAR mit richtigem Passwort, komprimiertes mehrteiliges RAR 4 bis zum Ergebnis, große echte Pakete, ein 7-Zip mit RAR (nur Attrappe).
+- Befehlszeile: `--version`, `--help`, `--add <url…>`, `--headless-download <url> --out <ordner>`. Unbekannte Argumente werden abgewiesen, statt die App zu starten.
+- `tools/publish.sh` baut eine einzelne Programmdatei (self-contained, linux-x64) mit `SHA256SUMS`, `tools/install.sh` und `tools/uninstall.sh` richten sie ohne root nach `~/.local` ein, mit Startmenü-Eintrag und Symbol.
+- `DOKUMENTATION.md`: Anleitung auf Deutsch.
+- Oberfläche für Linux mit Avalonia 12: Hauptfenster mit nativem Rahmen, Hinzufügen-Dialog, alle bisherigen Dialoge, Tray-Symbol, Benachrichtigungen, Zwischenablage-Überwachung, Click'n'Load, hell und dunkel, Skalierung.
+- Rapidgator-Dialog: Anmelden mit 2FA, Premium-Laufzeit, Traffic, Abmelden, fehlgeschlagene Downloads nach der Anmeldung neu starten.
+- Symbole aus den Fluent System Icons (MIT) statt der Windows-Schrift. Die Fensterknöpfe im macOS-Stil entfallen.
+- Rapidgator mit eigenem Premium-Konto (API v2): Anmelden mit 2FA, angemeldet bleiben bis zum Abmelden, automatischer Neu-Login mit Schutz vor Wiederholschleifen, Traffic-Prüfung, Online-Check, Vorrang vor AllDebrid. Nur gegen eine Attrappe getestet, nie gegen das echte Rapidgator.
+- Downloads merken sich den Dienst (`viaService`). Ältere Listen mit `debrid: true` gelten als AllDebrid.
+- Ein Rapidgator-Dateilink, der direkt geladen würde, scheitert, statt die Webseite als Datei zu speichern.
+
+### Geändert
+
+- Abspaltung von YDownloader 1.0.1 und Umbenennung in d6Downloader: Programmname `d6downloader`, neue Kennungen der Browser-Erweiterung, neuer Name des Native-Messaging-Hosts. Daten des Originals werden nicht übernommen.
+- Die Programmlogik liegt UI-frei in `D6Downloader.Core` (.NET 10), die Linux-Dienste in `D6Downloader.Platform.Linux`.
+- Geheimnisse werden mit AES-256-GCM statt mit der Windows-Datenschutz-API verschlüsselt. Der Schlüssel liegt in `~/.config/d6downloader/master.key` (nur für den eigenen Benutzer lesbar).
+- Zum Entpacken werden `7zz`, `7z`, `7za` und `bsdtar` aus dem PATH gesucht.
+- Die Registrierung beim Browser schreibt Manifest-Dateien statt Registry-Einträge. Angebunden sind Chrome, Chromium, Brave, Vivaldi, Edge und Firefox, jeweils nur bei vorhandenem Profilordner.
+- Speicherorte nach XDG, der Downloads-Ordner kommt aus `user-dirs.dirs`.
+- Einzelinstanz per Sperrdatei, Nachrichten zwischen den Prozessen über einen Unix-Socket.
+- Wachhalten über `systemd-inhibit`, Herunterfahren über KDE (sonst `systemctl`), Standby und Ruhezustand über `systemctl`.
+- Autostart als `.desktop`-Datei, Öffnen und „im Ordner zeigen“ über `xdg-open` und den Dateimanager.
+- Das Programm selbst beantwortet `--native-host`.
+- Die Sprachtexte nennen kein Windows, `tar.exe` oder `7z.exe` mehr.
+- Die Tests laufen unter Linux.
+- Die Windows-Oberfläche, ihre Bildschirmfotos, die PowerShell-Skripte und `icon.ico` sind entfernt.
+- Die Aktion „Nach Abschluss“ läuft im Hintergrund: Die Oberfläche bleibt ansprechbar, auch während das System herunterfährt.
+
+### Behoben (Linux)
+
+- Mehrteilige RAR wurden als „beschädigt“ gemeldet: Das 7-Zip von Fedora kann kein RAR und wurde trotzdem gestartet. Es wird für RAR nur noch benutzt, wenn es RAR nachweislich liest. Betroffene Pakete mit „Entpacken“ erneut versuchen.
+- Zwei Downloads auf dasselbe Ziel schrieben gleichzeitig in dieselbe Teildatei, auch aus zwei Prozessen.
+- Dateinamen behielten Steuerzeichen und Zeichen wie `:` oder `?`.
+- Lange Namen mit Umlauten oder Sonderzeichen konnten die Grenze von 255 Byte überschreiten.
+- Dateifehler (Ziel weg, kein Zugriff, Pfad zu lang) werden anhand der Linux-Fehlernummern erkannt.
+- Ein Zielordner, der als Verknüpfung ins Leere zeigt, wurde als „gibt es schon“ gemeldet.
+- Ohne vorhandenes `~/.config` konnte der Datenordner relativ zum Arbeitsordner entstehen.
+- Archive mit Ordnern ohne Zugriffsrechte ließen den vorübergehenden Entpackordner liegen.
+
+---
+
+# Historie des Originals (YDownloader)
+
 ## 1.0.1
 
 ### Added

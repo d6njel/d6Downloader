@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.CountdownSheet"
+             Width="380">
+    <StackPanel>
+        <TextBlock x:Name="TitleText" Classes="title" TextWrapping="Wrap"/>
+        <TextBlock x:Name="ReasonText" Classes="secondary" Margin="0,4,0,0" TextWrapping="Wrap"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0" Spacing="6">
+            <TextBlock x:Name="SecondsText" FontSize="48" FontWeight="SemiBold" Text="60"/>
+            <TextBlock Text="{l:Str Countdown.Unit}" FontSize="15" Foreground="{DynamicResource TextSecondary}"
+                       VerticalAlignment="Bottom" Margin="0,0,0,9"/>
+        </StackPanel>
+        <StackPanel Classes="buttons">
+            <Button x:Name="NowButton" Click="Now_Click"/>
+            <Button x:Name="CancelButton" Content="{l:Str Common.Cancel}" Classes="accent" IsDefault="True" IsCancel="True"
+                    Click="Cancel_Click"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

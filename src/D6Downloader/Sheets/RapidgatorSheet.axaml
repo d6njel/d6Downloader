@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.RapidgatorSheet"
+             Width="480">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <TextBlock Classes="title" Text="{l:Str Rapidgator.Title}"/>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <TextBlock Classes="secondary" Text="{l:Str Rapidgator.Intro}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+                <!-- Angemeldet: Konto, Premium, Traffic -->
+                <StackPanel x:Name="AccountPanel" Margin="0,14,0,0" IsVisible="False">
+                    <TextBlock x:Name="SignedInText" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+                        <TextBlock Classes="rowLabel" Text="{l:Str Rapidgator.PremiumLabel}"/>
+                        <TextBlock x:Name="PremiumText" Classes="rowLabel" Grid.Column="1"/>
+                        <TextBlock Classes="rowLabel" Grid.Row="1" Text="{l:Str Rapidgator.TrafficLabel}"/>
+                        <TextBlock x:Name="TrafficText" Classes="rowLabel" Grid.Row="1" Grid.Column="1"/>
+                    </Grid>
+                    <CheckBox x:Name="EnabledBox" Content="{l:Str Rapidgator.Enable}" Click="Enabled_Click"/>
+                </StackPanel>
+
+                <!-- Anmeldeformular -->
+                <StackPanel x:Name="LoginPanel" Margin="0,14,0,0" IsVisible="False">
+                    <TextBlock Classes="label" Text="{l:Str Rapidgator.Email}"/>
+                    <TextBox x:Name="EmailBox" TextChanged="Input_Changed"/>
+                    <TextBlock Classes="label" Text="{l:Str Rapidgator.Password}" Margin="0,10,0,3"/>
+                    <TextBox x:Name="PasswordBox" PasswordChar="●" TextChanged="Input_Changed"/>
+                    <TextBlock Classes="label" Text="{l:Str Rapidgator.Code}" Margin="0,10,0,3"/>
+                    <TextBox x:Name="OptionalCodeBox" PlaceholderText="{l:Str Rapidgator.CodeHint}"/>
+                </StackPanel>
+
+                <!-- Zwei-Faktor-Code nachreichen -->
+                <StackPanel x:Name="CodePanel" Margin="0,14,0,0" IsVisible="False">
+                    <TextBlock x:Name="CodePrompt" TextWrapping="Wrap"/>
+                    <TextBlock Classes="label" Text="{l:Str Rapidgator.Code}" Margin="0,10,0,3"/>
+                    <TextBox x:Name="CodeBox" TextChanged="Input_Changed"/>
+                </StackPanel>
+
+                <TextBlock x:Name="StatusText" TextWrapping="Wrap" Margin="0,10,0,0" IsVisible="False"/>
+                <Button x:Name="RetryButton" Margin="0,10,0,0" IsVisible="False" Click="Retry_Click"/>
+                <TextBlock x:Name="SignOutHint" Classes="secondary" Text="{l:Str Rapidgator.SignOutHint}" TextWrapping="Wrap"
+                           Margin="0,12,0,0" IsVisible="False"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,16,0,0">
+            <Button x:Name="SignOutButton" Content="{l:Str Rapidgator.SignOut}" IsVisible="False" Click="SignOut_Click"/>
+            <StackPanel Grid.Column="1" Classes="buttons" Margin="0">
+                <Button x:Name="CancelCodeButton" Content="{l:Str Common.Cancel}" IsVisible="False" Click="CancelCode_Click"/>
+                <Button x:Name="RefreshButton" Content="{l:Str Rapidgator.Refresh}" IsVisible="False" Click="Refresh_Click"/>
+                <Button x:Name="CloseButton" Content="{l:Str Common.Close}" IsCancel="True" Click="Close_Click"/>
+                <Button x:Name="SubmitButton" Classes="accent" IsDefault="True" IsVisible="False" Click="Submit_Click"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

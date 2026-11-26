@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:D6Downloader"
+             x:Class="D6Downloader.Sheets.ConfirmSheet"
+             Width="380">
+    <StackPanel>
+        <TextBlock x:Name="Heading" Classes="title" TextWrapping="Wrap"/>
+        <ScrollViewer MaxHeight="280" Margin="0,8,0,0">
+            <TextBlock x:Name="Message" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondary}"/>
+        </ScrollViewer>
+        <StackPanel Classes="buttons">
+            <Button x:Name="Cancel" Content="{l:Str Common.Cancel}" IsCancel="True" Click="Cancel_Click"/>
+            <Button x:Name="Ok" Classes="accent" IsDefault="True" Click="Ok_Click"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
