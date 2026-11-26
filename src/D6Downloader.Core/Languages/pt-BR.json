@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} arquivos compactados mantidos (lixeira indisponível ou arquivo alterado)",
   "Extract.Log.ArchivesDeleted": "{0} arquivos compactados excluídos permanentemente",
   "Extract.Log.ArchivesKeptDelete": "{0} arquivos compactados mantidos (arquivo alterado, link ou exclusão impossível)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} arquivos compactados mantidos (não foi possível comprovar que estão completos)",
   "Menu.Extract": "Extrair",
   "Menu.EnterPassword": "Inserir senha …",
   "Extract.NeedPasswordTried": "Senha necessária (testadas: {0})",

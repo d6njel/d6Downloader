@@ -21,7 +21,7 @@ public sealed record ExtractJob(string EntryPath, string TargetDir, ArchiveType 
 
 /// <param name="Detail">Kurzer Text des Entpackers bei <see cref="ExtractFailure.ToolFailed"/> und <see cref="ExtractFailure.Io"/> (höchstens 200 Zeichen), bei <see cref="ExtractFailure.NoSpace"/> „nötig|frei“ in Bytes, bei <see cref="ExtractState.NeedPassword"/> die Zahl der probierten Passwörter (fehlt bei 0).</param>
 /// <param name="UsedPassword">Das Passwort, mit dem entpackt wurde (nur im Speicher, null = keins nötig).</param>
-/// <param name="Unverified">Entpackt von einem Programm, das Schäden nicht sicher meldet (<c>bsdtar</c> bei ZIP und RAR): Das Archiv bleibt dann liegen.</param>
+/// <param name="Unverified">Entpackt, aber die Vollständigkeit ist nicht belegt (<c>bsdtar</c> bei ZIP und RAR, oder ein RAR, dessen Struktur sie nicht zeigt, siehe <see cref="RarCompleteness"/>): Das Archiv bleibt dann liegen.</param>
 public sealed record ExtractResult(ExtractState State, ExtractFailure Failure = ExtractFailure.None, string? Detail = null, int Files = 0,
     string? UsedPassword = null, bool Unverified = false);
 
@@ -185,6 +185,9 @@ public sealed partial class ArchiveExtractor
             var files = ValidateStaging(staging, ct);
             if (files is null) return new(ExtractState.Failed, ExtractFailure.Link);
             ct.ThrowIfCancellationRequested();
+            // RAR meldet fehlende Dateien am Ende nicht von selbst, auch wenn es anders heißt: dann muss die Struktur es belegen.
+            if (!unverified && (job.Type == ArchiveType.Rar || RarCompleteness.IsRar(job.EntryPath)))
+                unverified = !RarCompleteness.IsProven(job.PartPaths);
             int moved = MoveOut(staging, job.TargetDir, ct);
             return new(ExtractState.Done, Files: moved, UsedPassword: usedPassword, Unverified: unverified);
         }

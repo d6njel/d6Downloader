@@ -1288,7 +1288,8 @@ public sealed class DownloadManager
                 if (removed > 0)
                     group[entry].LogNote(Loc.T(permanently ? "Extract.Log.ArchivesDeleted" : "Extract.Log.ArchivesTrashed", removed));
                 if (kept > 0)
-                    group[entry].LogNote(Loc.T(permanently ? "Extract.Log.ArchivesKeptDelete" : "Extract.Log.ArchivesKept", kept));
+                    group[entry].LogNote(Loc.T(result.Unverified ? "Extract.Log.ArchivesKeptUnverified"
+                        : permanently ? "Extract.Log.ArchivesKeptDelete" : "Extract.Log.ArchivesKept", kept));
                 if (entered.Remember && result.UsedPassword is not null && result.UsedPassword == entered.Password)
                     RememberPassword(group[entry], result.UsedPassword);
             }

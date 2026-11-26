@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} arşiv dosyası tutuldu (çöp kutusu kullanılamadı veya dosya değişti)",
   "Extract.Log.ArchivesDeleted": "{0} arşiv dosyası kalıcı olarak silindi",
   "Extract.Log.ArchivesKeptDelete": "{0} arşiv dosyası tutuldu (dosya değişti, bağlantı veya silme mümkün değil)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} arşiv dosyası tutuldu (eksiksiz olduğu doğrulanamıyor)",
   "Menu.Extract": "Çıkar",
   "Menu.EnterPassword": "Parola gir …",
   "Extract.NeedPasswordTried": "Parola gerekli (denenen: {0})",

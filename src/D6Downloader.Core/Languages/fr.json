@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} fichiers d’archive conservés (corbeille impossible ou fichier modifié)",
   "Extract.Log.ArchivesDeleted": "{0} fichiers d’archive supprimés définitivement",
   "Extract.Log.ArchivesKeptDelete": "{0} fichiers d’archive conservés (fichier modifié, lien ou suppression impossible)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} fichiers d’archive conservés (intégralité impossible à vérifier)",
   "Menu.Extract": "Extraire",
   "Menu.EnterPassword": "Saisir le mot de passe …",
   "Extract.NeedPasswordTried": "Mot de passe nécessaire (essayés : {0})",

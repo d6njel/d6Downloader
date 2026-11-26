@@ -11,7 +11,7 @@
 
 - Einfache ZIP-Archive mit beschädigtem Inhalt galten als entpackt. Jetzt werden Länge und Prüfsumme (CRC32) jeder Datei geprüft, auch Ordnereinträge mit Daten gelten als Schaden. Dann heißt es „beschädigt“, es wird nichts übernommen und nichts entfernt.
 - `bsdtar` kann ein als beschädigt erkanntes ZIP, RAR oder 7z nicht mehr als entpackt durchwinken. Hat `bsdtar` ein ZIP oder RAR entpackt, bleiben die Archive liegen, weil es Schäden nicht sicher meldet.
-- Bekannte Grenze: Ein einteiliges RAR 4, das genau zwischen zwei Dateien abgeschnitten ist, wird mit weniger Dateien als entpackt gemeldet.
+- Ein RAR, das genau zwischen zwei Dateien abgeschnitten ist, wurde als vollständig entpackt behandelt und hätte entfernt werden können. RAR-Archive werden jetzt nur noch entfernt, wenn ihre Vollständigkeit belegt ist (Blockkette mit gültigen Kopf-Prüfsummen bis zum Ende-Block, bei Sätzen bis zum letzten Teil). Sonst wird entpackt, die Archive bleiben, und das Protokoll sagt es. Das betrifft auch alte RAR ohne Ende-Block und RAR mit verschlüsselten Dateinamen.
 
 ## d6Downloader 0.1.1 (2026-11-26)
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -36,9 +37,31 @@ public class UnarFakeTests : IDisposable
     private string Script(string name, string body)
     {
         string path = _dir.File(name);
-        File.WriteAllText(path, $"#!/bin/sh\necho \"{name} $*\" >> '{_log}'\n{body}\n");
+        File.WriteAllText(path, $"#!/bin/sh\n[ \"$1\" = --bereit ] && exit 0\necho \"{name} $*\" >> '{_log}'\n{body}\n");
         File.SetUnixFileMode(path, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+        WaitUntilStartable(path);
         return path;
+    }
+
+    /// <summary>
+    /// Parallele Tests starten Prozesse, und die erben kurz den Schreibzugriff auf das neue Skript: Ein Start scheitert dann mit
+    /// „Text file busy“. Nach dem ersten geglückten Start kann das nicht mehr vorkommen.
+    /// </summary>
+    private static void WaitUntilStartable(string path)
+    {
+        for (int attempt = 0; ; attempt++)
+        {
+            try
+            {
+                using var process = Process.Start(new ProcessStartInfo(path, "--bereit") { UseShellExecute = false })!;
+                process.WaitForExit();
+                return;
+            }
+            catch (Win32Exception) when (attempt < 200)
+            {
+                Thread.Sleep(10);
+            }
+        }
     }
 
     private static object Entry(string name, long size = 5, Dictionary<string, object>? extra = null)

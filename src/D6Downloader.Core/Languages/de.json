@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} Archivdateien behalten (Papierkorb nicht möglich oder Datei verändert)",
   "Extract.Log.ArchivesDeleted": "{0} Archivdateien endgültig gelöscht",
   "Extract.Log.ArchivesKeptDelete": "{0} Archivdateien behalten (Datei verändert, Verknüpfung oder Löschen nicht möglich)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} Archivdateien behalten (Vollständigkeit nicht belegbar)",
   "Menu.Extract": "Entpacken",
   "Menu.EnterPassword": "Passwort eingeben …",
   "Extract.NeedPasswordTried": "Passwort nötig (probiert: {0})",

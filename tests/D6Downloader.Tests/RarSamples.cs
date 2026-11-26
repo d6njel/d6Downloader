@@ -73,6 +73,93 @@ internal static class RarSamples
         to.Write(header);
     }
 
+    private static readonly byte[] Signature4 = { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x00 };
+    private static readonly byte[] Signature5 = { 0x52, 0x61, 0x72, 0x21, 0x1A, 0x07, 0x01, 0x00 };
+
+    /// <summary>
+    /// RAR 4 oder 5 mit mehreren gespeicherten Dateien. <paramref name="ends"/>: die Länge nach jeder Datei (dort lässt sich
+    /// genau zwischen zwei Dateien abschneiden). Der Ende-Block lässt sich weglassen.
+    /// </summary>
+    public static byte[] Several(int version, IReadOnlyList<(string Name, byte[] Content)> files, out List<int> ends, bool endBlock = true)
+    {
+        var to = new MemoryStream();
+        ends = new List<int>();
+        if (version == 4)
+        {
+            to.Write(Signature4);
+            Block(to, 0x73, 0, new byte[6]);
+        }
+        else
+        {
+            to.Write(Signature5);
+            Block5(to, 1, 0, new byte[] { 0 });
+        }
+        foreach (var (name, content) in files)
+        {
+            byte[] encoded = Encoding.UTF8.GetBytes(name);
+            var head = new MemoryStream();
+            var w = new BinaryWriter(head);
+            if (version == 4)
+            {
+                w.Write((uint)content.Length);
+                w.Write((uint)content.Length);
+                w.Write((byte)3);
+                w.Write(Crc32(content));
+                w.Write(0x58210000u);
+                w.Write((byte)20);
+                w.Write((byte)0x30);
+                w.Write((ushort)encoded.Length);
+                w.Write(0x81A4u);
+                w.Write(encoded);
+                Block(to, 0x74, 0x8000, head.ToArray());
+            }
+            else
+            {
+                VInt(head, 0x04);                 // CRC32 folgt
+                VInt(head, (ulong)content.Length);
+                VInt(head, 0x81A4);
+                w.Write(Crc32(content));
+                VInt(head, 0);                    // gespeichert
+                VInt(head, 1);                    // Unix
+                VInt(head, (ulong)encoded.Length);
+                head.Write(encoded);
+                Block5(to, 2, 0x02, head.ToArray(), content.Length);
+            }
+            to.Write(content);
+            ends.Add((int)to.Length);
+        }
+        if (endBlock && version == 4) Block(to, 0x7B, 0x4000, Array.Empty<byte>());
+        else if (endBlock) Block5(to, 5, 0, new byte[] { 0 });
+        return to.ToArray();
+    }
+
+    private static void VInt(Stream to, ulong value)
+    {
+        do
+        {
+            byte b = (byte)(value & 0x7F);
+            value >>= 7;
+            to.WriteByte(value != 0 ? (byte)(b | 0x80) : b);
+        } while (value != 0);
+    }
+
+    private static void Block5(Stream to, int type, int flags, byte[] body, int dataSize = -1)
+    {
+        var fields = new MemoryStream();
+        VInt(fields, (ulong)type);
+        VInt(fields, (ulong)flags);
+        if (dataSize >= 0) VInt(fields, (ulong)dataSize);
+        fields.Write(body);
+        var sized = new MemoryStream();
+        VInt(sized, (ulong)fields.Length);
+        sized.Write(fields.ToArray());
+        byte[] bytes = sized.ToArray();
+        var crc = new byte[4];
+        BinaryPrimitives.WriteUInt32LittleEndian(crc, Crc32(bytes));
+        to.Write(crc);
+        to.Write(bytes);
+    }
+
     /// <summary>
     /// Eine Datei auf <paramref name="volumes"/> Teile verteilt, als <c>name.part1.rar</c> … oder (<paramref name="oldNames"/>)
     /// <c>name.rar</c>, <c>name.r00</c> … RAR 4 trennt Ordner im Namen mit <c>\</c>.

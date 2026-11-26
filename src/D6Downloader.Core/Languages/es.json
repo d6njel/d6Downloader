@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} archivos comprimidos conservados (no se pudo usar la papelera o el archivo cambió)",
   "Extract.Log.ArchivesDeleted": "{0} archivos comprimidos eliminados definitivamente",
   "Extract.Log.ArchivesKeptDelete": "{0} archivos comprimidos conservados (archivo modificado, enlace o no se pudo eliminar)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} archivos comprimidos conservados (no se puede comprobar que estén completos)",
   "Menu.Extract": "Extraer",
   "Menu.EnterPassword": "Introducir contraseña …",
   "Extract.NeedPasswordTried": "Se necesita contraseña (probadas: {0})",

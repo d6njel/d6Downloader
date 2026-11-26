@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} file di archivio conservati (cestino non disponibile o file modificato)",
   "Extract.Log.ArchivesDeleted": "{0} file di archivio eliminati definitivamente",
   "Extract.Log.ArchivesKeptDelete": "{0} file di archivio conservati (file modificato, collegamento o eliminazione non possibile)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} file di archivio conservati (completezza non verificabile)",
   "Menu.Extract": "Estrai",
   "Menu.EnterPassword": "Inserisci password …",
   "Extract.NeedPasswordTried": "Serve la password (provate: {0})",

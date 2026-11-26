@@ -222,6 +222,7 @@
   "Extract.Log.ArchivesKept": "{0} archive files kept (trash not possible or file changed)",
   "Extract.Log.ArchivesDeleted": "{0} archive files permanently deleted",
   "Extract.Log.ArchivesKeptDelete": "{0} archive files kept (file changed, link, or deleting not possible)",
+  "Extract.Log.ArchivesKeptUnverified": "{0} archive files kept (completeness cannot be verified)",
   "Menu.Extract": "Extract",
   "Menu.EnterPassword": "Enter password …",
   "Extract.NeedPasswordTried": "Password needed (tried: {0})",

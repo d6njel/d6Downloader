@@ -220,6 +220,48 @@ public class DownloadManagerSmokeTests
         }
     }
 
+    /// <summary>Braucht <c>unar</c>, sonst prüft der Test nichts.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void A_rar_without_end_block_is_extracted_but_kept_with_its_own_log_line(bool permanently)
+    {
+        var env = ToolSearchEnv.Current(Array.Empty<string>());
+        if (ToolLocator.FindUnar(env) is null || ToolLocator.FindLsar(env) is null) return;
+        using var dir = new TempDir();
+        string archive = dir.File("a.rar");
+        File.WriteAllBytes(archive, RarSamples.Several(4, new[] { ("x.txt", new byte[] { 1, 2, 3 }) }, out _, endBlock: false));
+
+        var previous = SynchronizationContext.Current;
+        var ui = new QueueContext();
+        SynchronizationContext.SetSynchronizationContext(ui);
+        try
+        {
+            var trash = new FakeTrash();
+            var manager = new DownloadManager(new FakeTimers(), ui, trash: trash);
+            manager.Settings.DeleteArchivesAfterExtract = true;
+            manager.Settings.DeleteArchivesPermanently = permanently;
+            var item = new DownloadItem("http://127.0.0.1:1/a.rar", "a.rar", dir.Path);
+            manager.Add(new[] { item }, start: false);
+            item.Status = DownloadStatus.Completed;
+            item.FinalPath = archive;
+
+            manager.ExtractNow(new[] { item });
+            ui.RunUntil(() => item.Extract is not (ExtractState.None or ExtractState.Extracting));
+
+            Assert.Equal(ExtractState.Done, item.Extract);
+            Assert.Null(item.ExtractDetail);
+            Assert.True(File.Exists(archive));
+            Assert.Empty(trash.Moved);
+            Assert.Contains(item.Log, l => l.Text == Loc.T("Extract.Log.ArchivesKeptUnverified", 1));
+            manager.Shutdown();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+    }
+
     /// <summary>Gegen ein echtes 7-Zip; ohne eines prüft der Test nichts.</summary>
     [Fact]
     public void A_missing_or_wrong_password_deletes_nothing_and_the_right_one_deletes_all_parts()
