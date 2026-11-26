@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "Hai associato di nuovo lo stesso telefono? Rimuovi la voce vecchia.",
   "Settings.RemoteRemove": "Rimuovi",
   "Settings.RemoteRemoveAll": "Rimuovi tutti",
+  "Settings.RemoteRemoveAsk": "Rimuovere davvero il telefono “{0}”? Poi andrà abbinato di nuovo.",
+  "Settings.RemoteRemoveAllAsk": "Rimuovere davvero tutti i telefoni? Poi andranno abbinati di nuovo.",
   "Remote.Title": "Telefono",
   "Remote.Status.Off": "disattivato",
   "Remote.Status.Idle": "pronto, nessun telefono associato (nessuna connessione)",

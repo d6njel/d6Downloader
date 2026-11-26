@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "Dasselbe Handy neu gekoppelt? Dann den alten Eintrag entfernen.",
   "Settings.RemoteRemove": "Entfernen",
   "Settings.RemoteRemoveAll": "Alle entfernen",
+  "Settings.RemoteRemoveAsk": "Handy „{0}“ wirklich entfernen? Danach muss es neu gekoppelt werden.",
+  "Settings.RemoteRemoveAllAsk": "Wirklich alle Handys entfernen? Danach müssen sie neu gekoppelt werden.",
   "Remote.Title": "Handy",
   "Remote.Status.Off": "aus",
   "Remote.Status.Idle": "bereit, noch kein Handy gekoppelt (keine Verbindung)",

@@ -318,4 +318,36 @@ public class RemoteTests
         Assert.Null(ui.App.Remote!.Pairing);
         await Ui.WaitUntil(() => ui.Relay.OpenStreams == 0, "Abo beendet");
     }
+
+    [AvaloniaFact]
+    public void Removing_phones_asks_first()
+    {
+        using var ui = new Ui();
+        var devices = ui.Downloads.Settings.Remote.Devices;
+        foreach (string id in new[] { "a", "b", "c" })
+            devices.Add(new RemoteDevice { DeviceId = id, Name = "Handy " + id, PairedUtc = DateTime.UtcNow });
+        SettingsSheet.Open(ui.Window);
+        var settings = ui.Sheet<SettingsSheet>();
+        var panel = Ui.Find<Control>(settings, "RemovePanel");
+        Button First() => ((Grid)Ui.Find<StackPanel>(settings, "DeviceList").Children[0]).Children.OfType<Button>().Single();
+
+        Ui.Click(First());
+        Assert.True(panel.IsVisible);
+        Assert.Contains("Handy a", Ui.Find<TextBlock>(settings, "RemoveQuestion").Text);
+        Assert.Equal(3, devices.Count);
+        Ui.Click(settings, "RemoveCancelButton");
+        Assert.False(panel.IsVisible);
+        Assert.Equal(3, devices.Count);
+
+        Ui.Click(First());
+        Ui.Click(settings, "RemoveConfirmButton");
+        Assert.Equal(new[] { "b", "c" }, devices.Select(d => d.DeviceId));
+        Assert.False(panel.IsVisible);
+
+        Ui.Click(settings, "RemoveAllButton");
+        Assert.Equal(2, devices.Count);
+        Ui.Click(settings, "RemoveConfirmButton");
+        Assert.Empty(devices);
+        Assert.Same(settings, ui.Window.CurrentSheet);
+    }
 }

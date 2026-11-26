@@ -141,7 +141,9 @@ public partial class SettingsSheet : UserControl
                 VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             };
             var remove = new Button { Content = Loc.T("Settings.RemoteRemove"), Tag = device.DeviceId, Margin = new(8, 0, 0, 0) };
-            remove.Click += (sender, _) => _host.App.RemoveRemoteDevice((string)((Button)sender!).Tag!);
+            string name = device.Name;
+            remove.Click += (sender, _) => AskRemove(new() { (string)((Button)sender!).Tag! },
+                Loc.T("Settings.RemoteRemoveAsk", name), Loc.T("Settings.RemoteRemove"));
             Grid.SetColumn(remove, 1);
             var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
             row.Children.Add(text);
@@ -150,6 +152,8 @@ public partial class SettingsSheet : UserControl
         }
         DeviceHint.IsVisible = remote.Devices.Count > 0;
         RemoveAllButton.IsVisible = remote.Devices.Count > 1;
+        // Ist das Gefragte inzwischen weg (das Handy hat sich selbst entkoppelt), erübrigt sich die Rückfrage.
+        if (!remote.Devices.Exists(d => _toRemove.Contains(d.DeviceId))) RemovePanel.IsVisible = false;
     }
 
     private bool ServerValid(out string server)
@@ -231,9 +235,30 @@ public partial class SettingsSheet : UserControl
 
     private void PairCancel_Click(object? sender, RoutedEventArgs e) => EndPairing(cancel: true);
 
-    private void RemoveAll_Click(object? sender, RoutedEventArgs e)
+    private void RemoveAll_Click(object? sender, RoutedEventArgs e) =>
+        AskRemove(_downloads.Settings.Remote.Devices.Select(d => d.DeviceId).ToList(),
+            Loc.T("Settings.RemoteRemoveAllAsk"), Loc.T("Settings.RemoteRemoveAll"));
+
+    // Die Rückfrage steht im Sheet selbst: Ein ConfirmSheet würde die Einstellungen verdrängen, samt offenen Änderungen
+    // und laufendem Koppeln.
+    private List<string> _toRemove = new();
+
+    private void AskRemove(List<string> deviceIds, string question, string ok)
     {
-        foreach (var device in _downloads.Settings.Remote.Devices.ToList()) _host.App.RemoveRemoteDevice(device.DeviceId);
+        _toRemove = deviceIds;
+        RemoveQuestion.Text = question;
+        RemoveConfirmButton.Content = ok;
+        RemovePanel.IsVisible = true;
+        Dispatcher.UIThread.Post(RemovePanel.BringIntoView, DispatcherPriority.Background);
+    }
+
+    private void RemoveCancel_Click(object? sender, RoutedEventArgs e) => RemovePanel.IsVisible = false;
+
+    // Entfernt genau die Handys, nach denen gefragt wurde.
+    private void RemoveConfirm_Click(object? sender, RoutedEventArgs e)
+    {
+        RemovePanel.IsVisible = false;
+        foreach (string id in _toRemove) _host.App.RemoveRemoteDevice(id);
     }
 
     /// <summary>Programmname mit Version, darunter der Herkunftshinweis aus der eingebetteten NOTICE.md.</summary>

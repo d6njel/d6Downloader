@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "Paired the same phone again? Remove the old entry.",
   "Settings.RemoteRemove": "Remove",
   "Settings.RemoteRemoveAll": "Remove all",
+  "Settings.RemoteRemoveAsk": "Really remove the phone “{0}”? It will have to be paired again.",
+  "Settings.RemoteRemoveAllAsk": "Really remove all phones? They will have to be paired again.",
   "Remote.Title": "Phone",
   "Remote.Status.Off": "off",
   "Remote.Status.Idle": "ready, no phone paired yet (no connection)",

@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "Pareou o mesmo celular de novo? Remova a entrada antiga.",
   "Settings.RemoteRemove": "Remover",
   "Settings.RemoteRemoveAll": "Remover todos",
+  "Settings.RemoteRemoveAsk": "Remover mesmo o celular “{0}”? Depois será preciso pareá-lo de novo.",
+  "Settings.RemoteRemoveAllAsk": "Remover mesmo todos os celulares? Depois será preciso pareá-los de novo.",
   "Remote.Title": "Celular",
   "Remote.Status.Off": "desligado",
   "Remote.Status.Idle": "pronto, nenhum celular pareado (sem conexão)",

@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "Le même téléphone appairé à nouveau ? Retirez l’ancienne entrée.",
   "Settings.RemoteRemove": "Retirer",
   "Settings.RemoteRemoveAll": "Tout retirer",
+  "Settings.RemoteRemoveAsk": "Vraiment retirer le téléphone « {0} » ? Il faudra ensuite l’associer à nouveau.",
+  "Settings.RemoteRemoveAllAsk": "Vraiment retirer tous les téléphones ? Il faudra ensuite les associer à nouveau.",
   "Remote.Title": "Téléphone",
   "Remote.Status.Off": "désactivé",
   "Remote.Status.Idle": "prêt, aucun téléphone appairé (aucune connexion)",

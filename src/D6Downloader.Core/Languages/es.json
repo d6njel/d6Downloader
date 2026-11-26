@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "¿Has vinculado de nuevo el mismo móvil? Quita la entrada antigua.",
   "Settings.RemoteRemove": "Quitar",
   "Settings.RemoteRemoveAll": "Quitar todos",
+  "Settings.RemoteRemoveAsk": "¿Quitar de verdad el móvil «{0}»? Después habrá que vincularlo de nuevo.",
+  "Settings.RemoteRemoveAllAsk": "¿Quitar de verdad todos los móviles? Después habrá que vincularlos de nuevo.",
   "Remote.Title": "Móvil",
   "Remote.Status.Off": "desactivado",
   "Remote.Status.Idle": "listo, ningún móvil vinculado (sin conexión)",

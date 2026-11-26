@@ -693,6 +693,8 @@
   "Settings.RemoteDeviceHint": "Aynı telefonu yeniden mi eşleştirdiniz? Eski girdiyi kaldırın.",
   "Settings.RemoteRemove": "Kaldır",
   "Settings.RemoteRemoveAll": "Tümünü kaldır",
+  "Settings.RemoteRemoveAsk": "“{0}” adlı telefon gerçekten kaldırılsın mı? Sonra yeniden eşleştirilmesi gerekir.",
+  "Settings.RemoteRemoveAllAsk": "Tüm telefonlar gerçekten kaldırılsın mı? Sonra yeniden eşleştirilmeleri gerekir.",
   "Remote.Title": "Telefon",
   "Remote.Status.Off": "kapalı",
   "Remote.Status.Idle": "hazır, henüz eşleştirilmiş telefon yok (bağlantı yok)",

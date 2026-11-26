@@ -130,6 +130,13 @@
                         <StackPanel x:Name="DeviceList" Spacing="4"/>
                         <TextBlock x:Name="DeviceHint" Classes="secondary" Text="{l:Str Settings.RemoteDeviceHint}" TextWrapping="Wrap"/>
                         <Button x:Name="RemoveAllButton" Content="{l:Str Settings.RemoteRemoveAll}" Click="RemoveAll_Click"/>
+                        <StackPanel x:Name="RemovePanel" Spacing="6" IsVisible="False">
+                            <TextBlock x:Name="RemoveQuestion" TextWrapping="Wrap"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="RemoveCancelButton" Content="{l:Str Common.Cancel}" Click="RemoveCancel_Click"/>
+                                <Button x:Name="RemoveConfirmButton" Click="RemoveConfirm_Click"/>
+                            </StackPanel>
+                        </StackPanel>
                     </StackPanel>
                 </Grid>
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## d6Downloader 0.3.1 (in Arbeit, noch nicht veröffentlicht)
+
+### Geändert
+
+- Einstellungen → Handy: „Entfernen“ und „Alle entfernen“ fragen vorher nach.
+- Dazu die App „d6 Remote“ 0.1.1: Nachfrage vor „Verlauf löschen“, „Erneut senden“ auch im Teilen-Dialog, viel kleinere APK.
+- Noch ungeprüft: die Rückfrage auf einem echten Bildschirm und die neue App auf einem echten Handy.
+
+### Behoben
+
+- App „d6 Remote“: Kam eine Sendung trotz gemeldetem Fehler an und wurde erneut gesendet, blieb sie auf „wartet auf PC“. Die erste Rückmeldung wird jetzt gefunden.
+
 ## d6Downloader 0.3.0 (in Arbeit, noch nicht veröffentlicht)
 
 ### Neu

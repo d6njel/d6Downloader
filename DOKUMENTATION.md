@@ -319,8 +319,8 @@ Den QR-Code niemandem zeigen und nicht fotografieren: Wer ihn hat, kann dem PC L
 
 ### Entfernen
 
-In derselben Zeile steht jedes gekoppelte Handy mit **Entfernen**; bei mehreren auch **Alle entfernen**. Danach wird sein
-Kanal nicht mehr gelesen. Handy verloren oder Code fotografiert: sofort entfernen.
+In derselben Zeile steht jedes gekoppelte Handy mit **Entfernen**; bei mehreren auch **Alle entfernen**. Beides fragt vorher
+nach. Nach dem Bestätigen wird sein Kanal nicht mehr gelesen. Handy verloren oder Code fotografiert: sofort entfernen.
 
 ### Sicherheit und Grenzen
 
